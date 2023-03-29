@@ -16,21 +16,13 @@ contract FixMathTest is Test {
     CustomArray private a;
 
     function test() external {
-        uint256 value = 1;
+        a.push(0);
+        a.push(1);
+        a.push(2);
+        a.push(3);
 
-        a.push(value);
-
-        console2.log(a.get(0));
-
-        value = 2;
-
-        a.unshift(value);
-
-        console2.log(a.get(0));
-        console2.logBool(a.includes(0));
-
-        a.shift();
-
-        console2.log(a.get(0));
+        console2.log(a.atUint256(3));
+        console2.log(a.atUint256(1));
+        console2.log(a.atUint256(-4));
     }
 }

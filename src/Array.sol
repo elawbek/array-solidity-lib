@@ -2,9 +2,30 @@
 pragma solidity ^0.8.0;
 
 /**
+ * types in solidity:
+ * 1. uint / int:
+ * 256, 248, 240, 232, 224, 216, 208, 200, 192, 184, 176, 168, 160, 152, 144, 136
+ * |
+ * 128, 120, 112, 104, 96, 88, 80, 72, 64, 56, 48, 40, 32, 24, 16, 8
+ *
+ * 2. bytes:
+ * 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17
+ * |
+ * 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+ *
+ * 3. address
+ *
+ * 4. bool,
+ *
+ * (???)
+ * 5. bytes and strings
+ */
+
+/**
  * [] at
- *    - [x] init realization with uint256
- *    - [] negative index (from end)
+ *    - [x] one-slot value types (uint256)
+ *    - [] one-slot value types
+ *    - [x] negative index (from end)
  *    - [] small static types
  *    - [] dynamic types (?)
  * [] concat
@@ -20,9 +41,9 @@ pragma solidity ^0.8.0;
  * [] forEach
  *    - [] callbacks (?)
  * [] includes
- *    - [x] init realization with uint256
+ *    - [x] one-slot value types
  *    - [] all static types
- *    - dynamic types (?) (strings, bytes)
+ *    - [] dynamic types (?) (strings, bytes)
  * [] indexOf & lastIndexOf
  *    - [] (?)
  * [] join (???)
@@ -30,25 +51,25 @@ pragma solidity ^0.8.0;
  * [] map
  *    - [] callbacks (?)
  * [] pop
- *    - [] init realization with uint256
+ *    - [] one-slot value types
  *    - [] small static types
  *    - [] dynamic types
  * [] push
- *    - [x] init realization with uint256
+ *    - [x] one-slot value types
  *    - [] small static types
  *    - [] dynamic types
  * [] reverse (???)
  *    - [] (?)
  * [] shift
- *    - [x] init realization with uint256
+ *    - [x] one-slot value types
  *    - [] small static types
  *    - [] dynamic types
  * [] unshift
- *    - [x] init realization with uint256
+ *    - [x] one-slot value types
  *    - [] small static types
  *    - [] dynamic types
  * [] slice(?)
- *    - [] init realization with uint256
+ *    - [] one-slot value types
  *    - [] negative index (from end)
  *    - [] small static types
  *    - [] dynamic types (?)
@@ -65,13 +86,32 @@ struct CustomArray {
 }
 
 library Array {
-    function at(
+    error IndexDoesNotExist();
+
+    function atUint256(
         CustomArray storage _self,
-        uint256 index
+        int256 index
     ) internal view returns (uint256 result) {
+        _at(_self, index);
         assembly {
-            // let slot := add(sload(add(_self.slot, 0x01)), index)
-            result := sload(add(sload(add(_self.slot, 0x01)), index))
+            result := mload(0x00)
+        }
+    }
+
+    function _at(CustomArray storage _self, int256 index) private view {
+        assembly {
+            let length := sload(_self.slot)
+            if shr(0xff, index) {
+                index := sub(length, add(not(index), 0x01))
+            }
+
+            if iszero(lt(index, length)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+
+            mstore(0x00, sload(add(sload(add(_self.slot, 0x01)), index)))
         }
     }
 
