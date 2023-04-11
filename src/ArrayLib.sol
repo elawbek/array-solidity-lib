@@ -15,7 +15,7 @@ pragma solidity ^0.8.0;
  *
  * 3. address
  *
- * 4. bool,
+ * 4. bool (every bit (?))
  *
  * (???)
  * 5. bytes and strings
@@ -24,9 +24,9 @@ pragma solidity ^0.8.0;
 /**
  * [] at
  *    - [x] one-slot value types (uint256)
- *    - [] one-slot value types
+ *    - [x] one-slot value types
  *    - [x] negative index (from end)
- *    - [] small static types
+ *    - [x] small static types
  *    - [] dynamic types (?)
  * [] concat
  *    - [] (?)
@@ -81,44 +81,496 @@ pragma solidity ^0.8.0;
  * [] - remove
  */
 
-struct CustomArrayUint256 {
-    uint256 length;
-    uint256 slot;
-    uint256 _type;
-}
-
-struct CustomArrayUint248 {
-    uint256 length;
-    uint256 slot;
-    uint248 _type;
-}
-
-struct CustomArrayUint128 {
-    uint256 length;
-    uint256 slot;
-    uint128 _type;
-}
-
-struct CustomArrayUint88 {
-    uint256 length;
-    uint256 slot;
-    uint88 _type;
-}
-
-struct CustomArrayUint72 {
-    uint256 length;
-    uint256 slot;
-    uint72 _type;
-}
+import "./Types.sol";
 
 library Array {
     error IndexDoesNotExist();
 
-    // 256
+    // One-slot value types
+    function at(
+        CustomArrayAddress storage _self,
+        int256 index
+    ) internal view returns (address result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
     function at(
         CustomArrayUint256 storage _self,
         int256 index
     ) internal view returns (uint256 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint240 storage _self,
+        int256 index
+    ) internal view returns (uint240 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint232 storage _self,
+        int256 index
+    ) internal view returns (uint232 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint224 storage _self,
+        int256 index
+    ) internal view returns (uint224 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint216 storage _self,
+        int256 index
+    ) internal view returns (uint216 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint208 storage _self,
+        int256 index
+    ) internal view returns (uint208 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint200 storage _self,
+        int256 index
+    ) internal view returns (uint200 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint192 storage _self,
+        int256 index
+    ) internal view returns (uint192 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint184 storage _self,
+        int256 index
+    ) internal view returns (uint184 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint176 storage _self,
+        int256 index
+    ) internal view returns (uint176 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint168 storage _self,
+        int256 index
+    ) internal view returns (uint168 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint160 storage _self,
+        int256 index
+    ) internal view returns (uint160 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint152 storage _self,
+        int256 index
+    ) internal view returns (uint152 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint144 storage _self,
+        int256 index
+    ) internal view returns (uint144 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayUint136 storage _self,
+        int256 index
+    ) internal view returns (uint136 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt256 storage _self,
+        int256 index
+    ) internal view returns (int256 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt240 storage _self,
+        int256 index
+    ) internal view returns (int240 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt232 storage _self,
+        int256 index
+    ) internal view returns (int232 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt224 storage _self,
+        int256 index
+    ) internal view returns (int224 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt216 storage _self,
+        int256 index
+    ) internal view returns (int216 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt208 storage _self,
+        int256 index
+    ) internal view returns (int208 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt200 storage _self,
+        int256 index
+    ) internal view returns (int200 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt192 storage _self,
+        int256 index
+    ) internal view returns (int192 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt184 storage _self,
+        int256 index
+    ) internal view returns (int184 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt176 storage _self,
+        int256 index
+    ) internal view returns (int176 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt168 storage _self,
+        int256 index
+    ) internal view returns (int168 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt160 storage _self,
+        int256 index
+    ) internal view returns (int160 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt152 storage _self,
+        int256 index
+    ) internal view returns (int152 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt144 storage _self,
+        int256 index
+    ) internal view returns (int144 result) {
+        bytes32 _slot;
+        assembly {
+            _slot := _self.slot
+        }
+
+        _at(_slot, index);
+
+        assembly {
+            result := mload(0x00)
+        }
+    }
+
+    function at(
+        CustomArrayInt136 storage _self,
+        int256 index
+    ) internal view returns (int136 result) {
         bytes32 _slot;
         assembly {
             _slot := _self.slot
@@ -145,63 +597,6 @@ library Array {
             }
 
             mstore(0x00, sload(add(sload(add(_slot, 0x01)), index)))
-        }
-    }
-
-    // 128
-    function at(
-        CustomArrayUint128 storage _self,
-        int256 index
-    ) internal view returns (uint128 result) {
-        bytes32 _slot;
-        bytes32 _offset;
-        assembly {
-            _slot := _self.slot
-            _offset := 0x80
-        }
-
-        _at(_slot, index, _offset);
-
-        assembly {
-            result := mload(0x00)
-        }
-    }
-
-    // 88
-    function at(
-        CustomArrayUint88 storage _self,
-        int256 index
-    ) internal view returns (uint88 result) {
-        bytes32 _slot;
-        bytes32 _offset;
-        assembly {
-            _slot := _self.slot
-            _offset := 0x58
-        }
-
-        _at(_slot, index, _offset);
-
-        assembly {
-            result := mload(0x00)
-        }
-    }
-
-    // 72
-    function at(
-        CustomArrayUint72 storage _self,
-        int256 index
-    ) internal view returns (uint72 result) {
-        bytes32 _slot;
-        bytes32 _offset;
-        assembly {
-            _slot := _self.slot
-            _offset := 0x48
-        }
-
-        _at(_slot, index, _offset);
-
-        assembly {
-            result := mload(0x00)
         }
     }
 
