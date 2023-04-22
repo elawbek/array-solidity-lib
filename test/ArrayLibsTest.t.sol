@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import "forge-std/Test.sol";
-import {Uint256Array} from "src/Uint256Array.sol";
+import {console2, Test, stdStorage, StdStyle} from "forge-std/Test.sol";
+import {Uint256Array, lt, lte, gt, gte, eq} from "src/Uint256Array.sol";
 
-contract ArrayLibsTest {
+contract ArrayLibsTest is Test {
     using Uint256Array for *;
 
     Uint256Array.CustomArray private c256;
@@ -16,61 +16,68 @@ contract ArrayLibsTest {
     }
 
     function testUint256() external {
-        c256.push(type(uint8).max);
-        console2.log(StdStyle.red(c256.at(0)));
-        console2.log(StdStyle.red(c256.length()));
+        // c256.push(type(uint8).max);
+        // console2.log(StdStyle.red(c256.at(0)));
+        // console2.log(StdStyle.red(c256.length()));
 
-        c256.unshift(type(uint16).max);
-        console2.log(StdStyle.green(c256.at(0)));
-        console2.log(StdStyle.green(c256.at(-1)));
-        console2.log(StdStyle.green(c256.length()));
+        // c256.unshift(type(uint16).max);
+        // console2.log(StdStyle.green(c256.at(0)));
+        // console2.log(StdStyle.green(c256.at(-1)));
+        // console2.log(StdStyle.green(c256.length()));
 
-        c256.shift();
-        console2.log(StdStyle.blue(c256.at(0)));
-        console2.log(StdStyle.blue(c256.length()));
+        // c256.shift();
+        // console2.log(StdStyle.blue(c256.at(0)));
+        // console2.log(StdStyle.blue(c256.length()));
 
-        c256.pop();
-        console2.log(StdStyle.magenta(c256.length()));
+        // c256.pop();
+        // console2.log(StdStyle.magenta(c256.length()));
 
-        uint256[] memory arr = new uint256[](4);
+        uint256[] memory arr = new uint256[](5);
         arr[0] = type(uint8).max;
         arr[1] = type(uint16).max;
         arr[2] = type(uint24).max;
-        arr[3] = type(uint32).max;
+        arr[3] = type(uint8).max;
+        arr[4] = type(uint32).max;
+
+        // c256.concat(arr);
+        // console2.log(StdStyle.cyan(c256.at(0)));
+        // console2.log(StdStyle.cyan(c256.at(-3)));
+        // console2.log(StdStyle.cyan(c256.at(2)));
+        // console2.log(StdStyle.cyan(c256.at(-1)));
+        // console2.log(StdStyle.cyan(c256.length()));
+
+        // c256.fill(2);
+        // console2.log(StdStyle.bold(c256.at(0)));
+        // console2.log(StdStyle.bold(c256.at(-3)));
+        // console2.log(StdStyle.bold(c256.at(2)));
+        // console2.log(StdStyle.bold(c256.at(-1)));
+        // console2.log(StdStyle.bold(c256.length()));
+
+        // c256.fill(3, 2);
+        // console2.log(StdStyle.dim(c256.at(0)));
+        // console2.log(StdStyle.dim(c256.at(-3)));
+        // console2.log(StdStyle.dim(c256.at(2)));
+        // console2.log(StdStyle.dim(c256.at(-1)));
+        // console2.log(StdStyle.dim(c256.length()));
+
+        // c256.fill(4, 0, 1);
+        // console2.log(StdStyle.italic(c256.at(0)));
+        // console2.log(StdStyle.italic(c256.at(-3)));
+        // console2.log(StdStyle.italic(c256.at(2)));
+        // console2.log(StdStyle.italic(c256.at(-1)));
+        // console2.log(StdStyle.italic(c256.length()));
+
+        // c256.fill(5, 1, 1);
+        // console2.log(StdStyle.italic(c256.at(0)));
+        // console2.log(StdStyle.italic(c256.at(-3)));
+        // console2.log(StdStyle.italic(c256.at(2)));
+        // console2.log(StdStyle.italic(c256.at(-1)));
+        // console2.log(StdStyle.italic(c256.length()));
 
         c256.concat(arr);
-        console2.log(StdStyle.cyan(c256.at(0)));
-        console2.log(StdStyle.cyan(c256.at(-3)));
-        console2.log(StdStyle.cyan(c256.at(2)));
-        console2.log(StdStyle.cyan(c256.at(-1)));
-        console2.log(StdStyle.cyan(c256.length()));
 
-        c256.fill(2);
-        console2.log(StdStyle.bold(c256.at(0)));
-        console2.log(StdStyle.bold(c256.at(-3)));
-        console2.log(StdStyle.bold(c256.at(2)));
-        console2.log(StdStyle.bold(c256.at(-1)));
-        console2.log(StdStyle.bold(c256.length()));
+        int256 a = c256.findLastIndex(eq, type(uint8).max);
 
-        c256.fill(3, 2);
-        console2.log(StdStyle.dim(c256.at(0)));
-        console2.log(StdStyle.dim(c256.at(-3)));
-        console2.log(StdStyle.dim(c256.at(2)));
-        console2.log(StdStyle.dim(c256.at(-1)));
-        console2.log(StdStyle.dim(c256.length()));
-
-        c256.fill(4, 0, 1);
-        console2.log(StdStyle.italic(c256.at(0)));
-        console2.log(StdStyle.italic(c256.at(-3)));
-        console2.log(StdStyle.italic(c256.at(2)));
-        console2.log(StdStyle.italic(c256.at(-1)));
-        console2.log(StdStyle.italic(c256.length()));
-
-        c256.fill(5, 1, 1);
-        console2.log(StdStyle.italic(c256.at(0)));
-        console2.log(StdStyle.italic(c256.at(-3)));
-        console2.log(StdStyle.italic(c256.at(2)));
-        console2.log(StdStyle.italic(c256.at(-1)));
-        console2.log(StdStyle.italic(c256.length()));
+        console2.logInt(a);
     }
 }
