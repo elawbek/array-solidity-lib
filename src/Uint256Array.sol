@@ -6,9 +6,9 @@ pragma solidity ^0.8.0;
        - [x] negative index (from end)
     [x] concat
     [x] fill
-    [] filter
+    [x] filter
        - [x] lt, gt, eq, lte, gte
-       - [] bounds
+       - [x] bounds
     [] find & findLast
        - [x] lt, gt, eq, lte, gte
        - [] bounds
@@ -295,7 +295,7 @@ library Uint256Array {
     function includes(
         CustomArray storage _self,
         uint256 value,
-        uint indexFrom
+        uint256 indexFrom
     ) internal view returns (bool result) {
         uint256 indexTo;
         assembly {
@@ -307,8 +307,8 @@ library Uint256Array {
     function includes(
         CustomArray storage _self,
         uint256 value,
-        uint indexFrom,
-        uint indexTo
+        uint256 indexFrom,
+        uint256 indexTo
     ) internal view returns (bool result) {
         assembly {
             if gt(indexFrom, indexTo) {
@@ -406,7 +406,7 @@ library Uint256Array {
     function indexOf(
         CustomArray storage _self,
         uint256 value,
-        uint indexFrom
+        uint256 indexFrom
     ) internal view returns (int256 index) {
         uint256 indexTo;
         assembly {
@@ -467,7 +467,7 @@ library Uint256Array {
     function lastIndexOf(
         CustomArray storage _self,
         uint256 value,
-        uint indexFrom
+        uint256 indexFrom
     ) internal view returns (int256 index) {
         uint256 indexTo;
         assembly {
@@ -520,6 +520,41 @@ library Uint256Array {
         function(uint256, uint256) pure returns (bool) callback,
         uint256 comparativeValue
     ) internal view returns (uint256[] memory filteredArray) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        filteredArray = filter(_self, callback, comparativeValue, 0, indexTo);
+    }
+
+    function filter(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom
+    ) internal view returns (uint256[] memory filteredArray) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        filteredArray = filter(
+            _self,
+            callback,
+            comparativeValue,
+            indexFrom,
+            indexTo
+        );
+    }
+
+    function filter(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal view returns (uint256[] memory filteredArray) {
         uint256 len;
         bytes32 slot;
         assembly {
@@ -529,16 +564,30 @@ library Uint256Array {
                 return(filteredArray, 0x20)
             }
 
-            slot := sload(add(_self.slot, 0x01))
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
+                revert(0x1c, 0x04)
+            }
+
+            if iszero(lt(indexTo, len)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+
+            slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+            indexTo := add(indexTo, 0x01)
+            len := sub(indexTo, indexFrom)
         }
         uint256 counter;
         filteredArray = new uint256[](len);
 
         uint256 value;
-        for (uint256 i; i < len; ) {
+        for (; indexFrom < indexTo; ) {
             assembly {
                 value := sload(slot)
-                i := add(i, 0x01)
+                indexFrom := add(indexFrom, 0x01)
                 slot := add(slot, 0x01)
             }
 

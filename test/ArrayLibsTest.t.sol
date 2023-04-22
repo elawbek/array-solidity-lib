@@ -91,62 +91,80 @@ contract ArrayLibsTest is Test {
         u256.remove(6);
         logArray(u256, u256.length());
 
-        console2.logString("includes");
-        console2.log(
-            "Non-existent element from the whole array: ",
-            u256.includes(1)
-        );
-        console2.log(
-            "Non-existent element from 4 index: ",
-            u256.includes(0, 4)
-        );
-        console2.log(
-            "Non-existent element from 5 to 10 indexes: ",
-            u256.includes(3, 5, 10)
-        );
-        console2.log("Element from the whole array :", u256.includes(2048));
-        console2.log("Element from 8 index :", u256.includes(2048, 8));
-        console2.log(
-            "Element from 7 to 9 indexes :",
-            u256.includes(2048, 7, 9)
-        );
-        console2.logString("----------------------------------------");
+        // console2.logString("includes");
+        // console2.log(
+        //     "Non-existent element from the whole array: ",
+        //     u256.includes(1)
+        // );
+        // console2.log(
+        //     "Non-existent element from 4 index: ",
+        //     u256.includes(0, 4)
+        // );
+        // console2.log(
+        //     "Non-existent element from 5 to 10 indexes: ",
+        //     u256.includes(3, 5, 10)
+        // );
+        // console2.log("Element from the whole array :", u256.includes(2048));
+        // console2.log("Element from 8 index :", u256.includes(2048, 8));
+        // console2.log(
+        //     "Element from 7 to 9 indexes :",
+        //     u256.includes(2048, 7, 9)
+        // );
+        // console2.logString("----------------------------------------");
 
-        console2.logString("indexOf");
-        console2.log(
-            "Non-existent element from the whole array: ",
-            u256.indexOf(1)
-        );
-        console2.log("Non-existent element from 2 index: ", u256.indexOf(0, 4));
-        console2.log(
-            "Non-existent element from 5 to 10 indexes: ",
-            u256.indexOf(3, 5, 10)
-        );
-        console2.log("Element from the whole array :", u256.indexOf(2048));
-        console2.log("Element from 8 index :", u256.indexOf(2048, 8));
-        console2.log("Element from 7 to 9 indexes :", u256.indexOf(2048, 7, 9));
-        console2.logString("----------------------------------------");
+        // console2.logString("indexOf");
+        // console2.log(
+        //     "Non-existent element from the whole array: ",
+        //     u256.indexOf(1)
+        // );
+        // console2.log("Non-existent element from 2 index: ", u256.indexOf(0, 4));
+        // console2.log(
+        //     "Non-existent element from 5 to 10 indexes: ",
+        //     u256.indexOf(3, 5, 10)
+        // );
+        // console2.log("Element from the whole array :", u256.indexOf(2048));
+        // console2.log("Element from 8 index :", u256.indexOf(2048, 8));
+        // console2.log("Element from 7 to 9 indexes :", u256.indexOf(2048, 7, 9));
+        // console2.logString("----------------------------------------");
 
-        console2.logString("lastIndexOf");
-        console2.log(
-            "Non-existent element from the whole array: ",
-            u256.lastIndexOf(1)
-        );
-        console2.log(
-            "Non-existent element from 2 index: ",
-            u256.lastIndexOf(0, 4)
-        );
-        console2.log(
-            "Non-existent element from 5 to 10 indexes: ",
-            u256.lastIndexOf(3, 5, 10)
-        );
-        console2.log("Element from the whole array :", u256.lastIndexOf(2048));
-        console2.log("Element from 8 index :", u256.lastIndexOf(2048, 8));
-        console2.log(
-            "Element from 7 to 9 indexes :",
-            u256.lastIndexOf(2048, 7, 9)
-        );
+        // console2.logString("lastIndexOf");
+        // console2.log(
+        //     "Non-existent element from the whole array: ",
+        //     u256.lastIndexOf(1)
+        // );
+        // console2.log(
+        //     "Non-existent element from 2 index: ",
+        //     u256.lastIndexOf(0, 4)
+        // );
+        // console2.log(
+        //     "Non-existent element from 5 to 10 indexes: ",
+        //     u256.lastIndexOf(3, 5, 10)
+        // );
+        // console2.log("Element from the whole array :", u256.lastIndexOf(2048));
+        // console2.log("Element from 8 index :", u256.lastIndexOf(2048, 8));
+        // console2.log(
+        //     "Element from 7 to 9 indexes :",
+        //     u256.lastIndexOf(2048, 7, 9)
+        // );
+        // console2.logString("----------------------------------------");
+
+        console2.logString("filter");
         console2.logString("----------------------------------------");
+        console2.logString("Filter elems lt 42");
+        uint256[] memory res = u256.filter(lt, 42);
+        logArray(res);
+
+        console2.logString("Filter elems gt 5 from 3 index");
+        res = u256.filter(gt, 5, 3);
+        logArray(res);
+
+        console2.logString("Filter elems eq 3 from 4 to 9 indexes");
+        res = u256.filter(eq, 3, 4, 11);
+        logArray(res);
+
+        console2.logString("Empty array");
+        res = u256.filter(gt, 2048);
+        logArray(res);
     }
 
     function logArray(
@@ -158,6 +176,17 @@ contract ArrayLibsTest is Test {
         int i;
         while (abs(i) < length) {
             console2.log("index: %s, elem: %s", abs(i), array.at(i));
+            ++i;
+        }
+        console2.logString("----------------------------------------");
+    }
+
+    function logArray(uint256[] memory array) private view {
+        console2.log("length: ", array.length);
+
+        uint256 i;
+        while (i < array.length) {
+            console2.log("index: %s, elem: %s", i, array[i]);
             ++i;
         }
         console2.logString("----------------------------------------");
