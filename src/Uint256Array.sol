@@ -9,12 +9,12 @@ pragma solidity ^0.8.0;
     [x] filter
        - [x] lt, gt, eq, lte, gte
        - [x] bounds
-    [] find & findLast
+    [x] find & findLast
        - [x] lt, gt, eq, lte, gte
-       - [] bounds
-    [] findIndex & findLastIndex
+       - [x] bounds
+    [x] findIndex & findLastIndex
        - [x] lt, gt, eq, lte, gte
-       - [] bounds
+       - [x] bounds
     [x] includes
        - [x] bounds
     [x] indexOf & lastIndexOf
@@ -608,32 +608,79 @@ library Uint256Array {
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
         uint256 comparativeValue
-    ) internal view returns (uint256[] memory filteredArray) {
-        filteredArray = new uint256[](1);
+    ) internal view returns (uint256[] memory findedValue) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
 
-        uint256 len;
+        findedValue = find(_self, callback, comparativeValue, 0, indexTo);
+    }
+
+    function find(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom
+    ) internal view returns (uint256[] memory findedValue) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        findedValue = find(
+            _self,
+            callback,
+            comparativeValue,
+            indexFrom,
+            indexTo
+        );
+    }
+
+    function find(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal view returns (uint256[] memory findedValue) {
         bytes32 slot;
         assembly {
-            len := sload(_self.slot)
+            let len := sload(_self.slot)
 
             if iszero(len) {
-                return(filteredArray, 0x20)
+                return(findedValue, 0x20)
             }
 
-            slot := sload(add(_self.slot, 0x01))
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
+                revert(0x1c, 0x04)
+            }
+
+            if iszero(lt(indexTo, len)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+
+            slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+            indexTo := add(indexTo, 0x01)
         }
+
+        findedValue = new uint256[](1);
 
         bool success;
         uint256 value;
-        for (uint256 i; i < len; ) {
+        for (; indexFrom < indexTo; ) {
             assembly {
                 value := sload(slot)
-                i := add(i, 0x01)
+                indexFrom := add(indexFrom, 0x01)
                 slot := add(slot, 0x01)
             }
 
             if (callback(value, comparativeValue)) {
-                filteredArray[0] = value;
+                findedValue[0] = value;
                 success = true;
                 break;
             }
@@ -641,7 +688,7 @@ library Uint256Array {
 
         assembly {
             if iszero(success) {
-                mstore(filteredArray, 0x00)
+                mstore(findedValue, 0x00)
             }
         }
     }
@@ -650,32 +697,79 @@ library Uint256Array {
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
         uint256 comparativeValue
-    ) internal view returns (uint256[] memory filteredArray) {
-        filteredArray = new uint256[](1);
+    ) internal view returns (uint256[] memory findedValue) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
 
-        uint256 len;
+        findedValue = findLast(_self, callback, comparativeValue, 0, indexTo);
+    }
+
+    function findLast(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom
+    ) internal view returns (uint256[] memory findedValue) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        findedValue = findLast(
+            _self,
+            callback,
+            comparativeValue,
+            indexFrom,
+            indexTo
+        );
+    }
+
+    function findLast(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal view returns (uint256[] memory findedValue) {
         bytes32 slot;
         assembly {
-            len := sload(_self.slot)
+            let len := sload(_self.slot)
 
             if iszero(len) {
-                return(filteredArray, 0x20)
+                return(findedValue, 0x20)
             }
 
-            slot := sub(add(sload(add(_self.slot, 0x01)), len), 0x01)
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
+                revert(0x1c, 0x04)
+            }
+
+            if iszero(lt(indexTo, len)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+
+            slot := add(sload(add(_self.slot, 0x01)), indexTo)
+            indexTo := add(indexTo, 0x01)
         }
+        findedValue = new uint256[](1);
 
         bool success;
         uint256 value;
-        for (; len > 0; ) {
+
+        for (; indexFrom < indexTo; ) {
             assembly {
                 value := sload(slot)
-                len := sub(len, 0x01)
+                indexFrom := add(indexFrom, 0x1)
                 slot := sub(slot, 0x01)
             }
 
             if (callback(value, comparativeValue)) {
-                filteredArray[0] = value;
+                findedValue[0] = value;
                 success = true;
                 break;
             }
@@ -683,7 +777,7 @@ library Uint256Array {
 
         assembly {
             if iszero(success) {
-                mstore(filteredArray, 0x00)
+                mstore(findedValue, 0x00)
             }
         }
     }
@@ -693,29 +787,79 @@ library Uint256Array {
         function(uint256, uint256) pure returns (bool) callback,
         uint256 comparativeValue
     ) internal view returns (int256 index) {
-        uint256 len;
-        bytes32 slot;
+        uint256 indexTo;
         assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        index = findIndex(_self, callback, comparativeValue, 0, indexTo);
+    }
+
+    function findIndex(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom
+    ) internal view returns (int256 index) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        index = findIndex(
+            _self,
+            callback,
+            comparativeValue,
+            indexFrom,
+            indexTo
+        );
+    }
+
+    function findIndex(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal view returns (int256 index) {
+        bytes32 slot;
+        uint256 indexToCashed;
+        assembly {
+            let len := sload(_self.slot)
+
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
+                revert(0x1c, 0x04)
+            }
+
+            if iszero(lt(indexTo, len)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+
+            slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+            indexTo := add(indexTo, 0x01)
+
             index := not(0x00)
-            len := sload(_self.slot)
-            slot := sload(add(_self.slot, 0x01))
         }
 
         uint256 value;
-        for (uint256 i; i < len; ) {
+        for (; indexFrom < indexTo; ) {
             assembly {
                 value := sload(slot)
             }
 
             if (callback(value, comparativeValue)) {
                 assembly {
-                    index := i
+                    index := indexFrom
                 }
                 break;
             }
 
             assembly {
-                i := add(i, 0x01)
+                indexFrom := add(indexFrom, 0x01)
                 slot := add(slot, 0x01)
             }
         }
@@ -725,28 +869,82 @@ library Uint256Array {
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
         uint256 comparativeValue
-    ) internal view returns (int index) {
-        uint256 len;
-        bytes32 slot;
+    ) internal view returns (int256 index) {
+        uint256 indexTo;
         assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        index = findLastIndex(_self, callback, comparativeValue, 0, indexTo);
+    }
+
+    function findLastIndex(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom
+    ) internal view returns (int256 index) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        index = findLastIndex(
+            _self,
+            callback,
+            comparativeValue,
+            indexFrom,
+            indexTo
+        );
+    }
+
+    function findLastIndex(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal view returns (int256 index) {
+        bytes32 slot;
+        uint256 indexToCashed;
+        assembly {
+            let len := sload(_self.slot)
+
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
+                revert(0x1c, 0x04)
+            }
+
+            if iszero(lt(indexTo, len)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+
+            slot := add(sload(add(_self.slot, 0x01)), indexTo)
+            indexToCashed := add(indexTo, 0x01)
+
             index := not(0x00)
-            len := sload(_self.slot)
-            slot := sub(add(sload(add(_self.slot, 0x01)), len), 0x01)
         }
 
         uint256 value;
-        for (; len > 0; ) {
+        for (; indexFrom < indexToCashed; ) {
             assembly {
                 value := sload(slot)
-                len := sub(len, 0x01)
-                slot := sub(slot, 0x01)
             }
 
             if (callback(value, comparativeValue)) {
                 assembly {
-                    index := len
+                    index := indexTo
                 }
                 break;
+            }
+
+            assembly {
+                indexFrom := add(indexFrom, 0x01)
+                indexTo := sub(indexTo, 0x01)
+                slot := sub(slot, 0x01)
             }
         }
     }

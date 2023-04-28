@@ -148,23 +148,73 @@ contract ArrayLibsTest is Test {
         // );
         // console2.logString("----------------------------------------");
 
-        console2.logString("filter");
+        // console2.logString("filter");
+        // console2.logString("----------------------------------------");
+        // console2.logString("Filter elems lt 42");
+        // uint256[] memory res = u256.filter(lt, 42);
+        // logArray(res);
+
+        // console2.logString("Filter elems gt 5 from 3 index");
+        // res = u256.filter(gt, 5, 3);
+        // logArray(res);
+
+        // console2.logString("Filter elems eq 3 from 4 to 9 indexes");
+        // res = u256.filter(eq, 3, 4, 11);
+        // logArray(res);
+
+        // console2.logString("Empty array");
+        // res = u256.filter(gt, 2048);
+        // logArray(res);
+
+        console2.logString("find/findLast & findIndex/findLastIndex");
         console2.logString("----------------------------------------");
-        console2.logString("Filter elems lt 42");
-        uint256[] memory res = u256.filter(lt, 42);
-        logArray(res);
+        // console2.logString("find first > 10");
+        // uint256[] memory res = u256.find(gt, 10);
+        // logArray(res);
 
-        console2.logString("Filter elems gt 5 from 3 index");
-        res = u256.filter(gt, 5, 3);
-        logArray(res);
+        // console2.logString("find first < 10 in range 5-last");
+        // res = u256.find(lt, 10, 5);
+        // logArray(res);
 
-        console2.logString("Filter elems eq 3 from 4 to 9 indexes");
-        res = u256.filter(eq, 3, 4, 11);
-        logArray(res);
+        // console2.logString("find first > 0 in range 0-4");
+        // res = u256.find(gt, 0, 0, 4);
+        // logArray(res);
 
-        console2.logString("Empty array");
-        res = u256.filter(gt, 2048);
-        logArray(res);
+        // console2.logString("find last > 10");
+        // res = u256.findLast(gt, 10);
+        // logArray(res);
+
+        // console2.logString("find last < 10 in range 5-last");
+        // res = u256.findLast(lt, 10, 5);
+        // logArray(res);
+
+        // console2.logString("find last > 0 in range 0-4");
+        // res = u256.findLast(gt, 0, 0, 4);
+        // logArray(res);
+
+        console2.logString("find index first > 10");
+        int256 index = u256.findIndex(gt, 10);
+        console2.logInt(index);
+
+        console2.logString("find index first < 10 in range 5-last");
+        index = u256.findIndex(lt, 10, 5);
+        console2.logInt(index);
+
+        console2.logString("find index first > 0 in range 0-4");
+        index = u256.findIndex(gt, 0, 0, 4);
+        console2.logInt(index);
+
+        console2.logString("find index last > 10");
+        index = u256.findLastIndex(gt, 10);
+        console2.logInt(index);
+
+        console2.logString("find index last < 10 in range 5-last");
+        index = u256.findLastIndex(lt, 10, 5);
+        console2.logInt(index);
+
+        console2.logString("find index last > 0 in range 0-4");
+        index = u256.findLastIndex(gt, 0, 0, 4);
+        console2.logInt(index);
     }
 
     function logArray(
