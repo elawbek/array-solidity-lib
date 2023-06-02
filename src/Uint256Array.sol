@@ -19,9 +19,6 @@ pragma solidity ^0.8.0;
        - [x] bounds
     [x] indexOf & lastIndexOf
        - [x] bounds
-    [] forEach
-       - [] callbacks
-       - [] bounds
     [] map
        - [] callbacks
        - [] bounds
@@ -38,8 +35,8 @@ pragma solidity ^0.8.0;
        - [] callbacks
        - [] bounds
     [] sort(???)
-    [x] - length
-    [x] - remove
+    [x] length
+    [x] remove
     [x] update
  */
 
@@ -823,7 +820,6 @@ library Uint256Array {
         uint256 indexTo
     ) internal view returns (int256 index) {
         bytes32 slot;
-        uint256 indexToCashed;
         assembly {
             let len := sload(_self.slot)
 
@@ -981,5 +977,146 @@ function lte(uint256 a, uint256 b) pure returns (bool result) {
 function gte(uint256 a, uint256 b) pure returns (bool result) {
     assembly {
         result := iszero(lt(a, b))
+    }
+}
+
+error Overflow();
+error Underflow();
+error DivisionByZero();
+
+function add(uint256 a, uint256 b) pure returns (uint256 result) {
+    assembly {
+        result := add(a, b)
+
+        if gt(a, result) {
+            mstore(0x00, 0x35278d12)
+            revert(0x1c, 0x04)
+        }
+    }
+}
+
+function sub(uint256 a, uint256 b) pure returns (uint256 result) {
+    assembly {
+        result := sub(a, b)
+
+        if lt(a, result) {
+            mstore(0x00, 0xcaccb6d9)
+            revert(0x1c, 0x04)
+        }
+    }
+}
+
+function mul(uint256 a, uint256 b) pure returns (uint256 result) {
+    assembly {
+        result := mul(a, b)
+
+        if and(gt(b, 0x00), iszero(eq(a, div(result, b)))) {
+            mstore(0x00, 0x35278d12)
+            revert(0x1c, 0x04)
+        }
+    }
+}
+
+function div(uint256 a, uint256 b) pure returns (uint256 result) {
+    assembly {
+        if iszero(b) {
+            mstore(0x00, 0x23d359a3)
+            revert(0x1c, 0x04)
+        }
+
+        result := div(a, b)
+    }
+}
+
+function mod(uint256 a, uint256 b) pure returns (uint256 result) {
+    assembly {
+        if iszero(b) {
+            mstore(0x00, 0x23d359a3)
+            revert(0x1c, 0x04)
+        }
+
+        result := mod(a, b)
+    }
+}
+
+function exp(uint256 a, uint256 b) pure returns (uint256 result) {
+    assembly {
+        switch b
+        case 0x00 {
+            result := 0x01
+        }
+        case 0x01 {
+            result := a
+        }
+        default {
+            switch a
+            case 0x00 {
+                // do nothing, result already zero
+            }
+            case 0x01 {
+                result := 0x01
+            }
+            case 0x02 {
+                if gt(b, 0xff) {
+                    mstore(0x00, 0x35278d12)
+                    revert(0x1c, 0x04)
+                }
+                result := shl(b, 0x01)
+            }
+            default {
+                switch or(
+                    and(lt(a, 0x0b), lt(b, 0x4e)),
+                    and(lt(a, 0x133), lt(b, 0x20))
+                )
+                case 0x01 {
+                    result := exp(a, b)
+                }
+                default {
+                    let maxUint256 := not(0x00)
+                    let helper := 0x01
+
+                    for {
+                        let one := helper
+                    } 1 {
+
+                    } {
+                        if gt(a, div(maxUint256, a)) {
+                            mstore(0x00, 0x35278d12)
+                            revert(0x1c, 0x04)
+                        }
+
+                        switch and(b, one)
+                        case 0x01 {
+                            helper := mul(a, helper)
+                            b := shr(one, b)
+                            a := mul(a, a)
+                        }
+                        default {
+                            b := shr(one, b)
+                            a := mul(a, a)
+                        }
+
+                        if gt(helper, b) {
+                            continue
+                        }
+
+                        break
+                    }
+
+                    if gt(helper, div(maxUint256, a)) {
+                        mstore(0x00, 0x35278d12)
+                        revert(0x1c, 0x04)
+                    }
+
+                    result := mul(helper, a)
+                }
+            }
+        }
+    }
+}
+
+function xor(uint256 a, uint256 b) pure returns (uint256 result) {
+    assembly {
+        result := xor(a, b)
     }
 }
