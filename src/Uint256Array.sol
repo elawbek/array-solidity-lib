@@ -2,10 +2,21 @@
 pragma solidity ^0.8.0;
 
 /**
+    [x] length
     [x] at
        - [x] negative index (from end)
+    [x] push
+    [x] unshift
     [x] concat
+    [x] pop
+    [x] shift
+    [x] update
+    [x] remove
+    [x] includes
+        - [x] bounds
     [x] fill
+    [x] indexOf & lastIndexOf
+       - [x] bounds
     [x] filter
        - [x] lt, gt, eq, lte, gte
        - [x] bounds
@@ -15,29 +26,21 @@ pragma solidity ^0.8.0;
     [x] findIndex & findLastIndex
        - [x] lt, gt, eq, lte, gte
        - [x] bounds
-    [x] includes
+    [x] map
+       - [x] add, sub, mul, div, mod, pow, xor
        - [x] bounds
-    [x] indexOf & lastIndexOf
-       - [x] bounds
-    [] map
-       - [] callbacks
+    [] forEach
+       - [x] add, sub, mul, div, mod, pow, xor
        - [] bounds
-    [x] pop
-    [x] push
     [] reverse (???)
        - [] (?)
        - [] bounds
-    [x] shift
-    [x] unshift
     [] slice(?)
        - [] negative index (from end)
     [] some(?)
        - [] callbacks
        - [] bounds
     [] sort(???)
-    [x] length
-    [x] remove
-    [x] update
  */
 
 library Uint256Array {
@@ -68,6 +71,7 @@ library Uint256Array {
                 index := sub(len, add(not(index), 0x01))
             }
 
+            // TODO rewrite to switch
             if iszero(lt(index, len)) {
                 // IndexDoesNotExist()
                 mstore(0x00, 0x2238ba58)
@@ -75,27 +79,6 @@ library Uint256Array {
             }
 
             result := sload(add(sload(add(_self.slot, 0x01)), index))
-        }
-    }
-
-    function update(
-        CustomArray storage _self,
-        int256 index,
-        uint256 value
-    ) internal {
-        assembly {
-            let len := sload(_self.slot)
-            if shr(0xff, index) {
-                index := sub(len, add(not(index), 0x01))
-            }
-
-            if iszero(lt(index, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
-            }
-
-            sstore(add(sload(add(_self.slot, 0x01)), index), value)
         }
     }
 
@@ -142,48 +125,6 @@ library Uint256Array {
             sstore(add(slot, 0x02), value3)
 
             sstore(_self.slot, add(len, 0x03))
-        }
-    }
-
-    function concat(
-        CustomArray storage _self,
-        uint256[] memory values
-    ) internal {
-        assembly {
-            let len := sload(_self.slot)
-            let lenArray := mload(values)
-
-            for {
-                let i := lenArray
-                let slot := add(sload(add(_self.slot, 0x01)), len)
-                let offset := add(values, 0x20)
-            } i {
-                i := sub(i, 0x01)
-                slot := add(slot, 0x01)
-                offset := add(offset, 0x20)
-            } {
-                sstore(slot, mload(offset))
-            }
-
-            sstore(_self.slot, add(len, lenArray))
-        }
-    }
-
-    function pop(CustomArray storage _self) internal returns (uint256 elem) {
-        assembly {
-            let len := sload(_self.slot)
-
-            if iszero(len) {
-                // ArrayIsEmpty()
-                mstore(0x00, 0x5585048a)
-                revert(0x1c, 0x04)
-            }
-
-            len := sub(len, 0x01)
-            let slot := add(sload(add(_self.slot, 0x01)), len)
-            elem := sload(slot)
-            sstore(slot, 0x00)
-            sstore(_self.slot, len)
         }
     }
 
@@ -235,10 +176,54 @@ library Uint256Array {
         }
     }
 
+    function concat(
+        CustomArray storage _self,
+        uint256[] memory values
+    ) internal {
+        assembly {
+            let len := sload(_self.slot)
+            let lenArray := mload(values)
+
+            for {
+                let i := lenArray
+                let slot := add(sload(add(_self.slot, 0x01)), len)
+                let offset := add(values, 0x20)
+            } i {
+                i := sub(i, 0x01)
+                slot := add(slot, 0x01)
+                offset := add(offset, 0x20)
+            } {
+                sstore(slot, mload(offset))
+            }
+
+            sstore(_self.slot, add(len, lenArray))
+        }
+    }
+
+    function pop(CustomArray storage _self) internal returns (uint256 elem) {
+        assembly {
+            let len := sload(_self.slot)
+
+            // TODO rewrite to switch
+            if iszero(len) {
+                // ArrayIsEmpty()
+                mstore(0x00, 0x5585048a)
+                revert(0x1c, 0x04)
+            }
+
+            len := sub(len, 0x01)
+            let slot := add(sload(add(_self.slot, 0x01)), len)
+            elem := sload(slot)
+            sstore(slot, 0x00)
+            sstore(_self.slot, len)
+        }
+    }
+
     function shift(CustomArray storage _self) internal returns (uint256 elem) {
         assembly {
             let len := sload(_self.slot)
 
+            // TODO rewrite to switch
             if iszero(len) {
                 // ArrayIsEmpty()
                 mstore(0x00, 0x5585048a)
@@ -256,6 +241,28 @@ library Uint256Array {
         }
     }
 
+    function update(
+        CustomArray storage _self,
+        int256 index,
+        uint256 value
+    ) internal {
+        assembly {
+            let len := sload(_self.slot)
+            if shr(0xff, index) {
+                index := sub(len, add(not(index), 0x01))
+            }
+
+            // TODO rewrite to switch
+            if iszero(lt(index, len)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+
+            sstore(add(sload(add(_self.slot, 0x01)), index), value)
+        }
+    }
+
     function remove(CustomArray storage _self, int256 index) internal {
         assembly {
             let len := sload(_self.slot)
@@ -264,6 +271,7 @@ library Uint256Array {
                 index := sub(len, add(not(index), 0x01))
             }
 
+            // TODO rewrite to switch
             if iszero(lt(index, len)) {
                 // IndexDoesNotExist()
                 mstore(0x00, 0x2238ba58)
@@ -316,6 +324,7 @@ library Uint256Array {
 
             let len := sload(_self.slot)
 
+            // TODO rewrite to switch
             if iszero(lt(indexTo, len)) {
                 // IndexDoesNotExist()
                 mstore(0x00, 0x2238ba58)
@@ -371,6 +380,7 @@ library Uint256Array {
 
             let len := sload(_self.slot)
 
+            // TODO rewrite to switch
             if iszero(lt(indexTo, len)) {
                 // IndexDoesNotExist()
                 mstore(0x00, 0x2238ba58)
@@ -428,6 +438,7 @@ library Uint256Array {
 
             let len := sload(_self.slot)
 
+            // TODO rewrite to switch
             if iszero(lt(indexTo, len)) {
                 // IndexDoesNotExist()
                 mstore(0x00, 0x2238ba58)
@@ -489,6 +500,7 @@ library Uint256Array {
 
             let len := sload(_self.slot)
 
+            // TODO rewrite to switch
             if iszero(lt(indexTo, len)) {
                 // IndexDoesNotExist()
                 mstore(0x00, 0x2238ba58)
@@ -557,6 +569,7 @@ library Uint256Array {
         assembly {
             len := sload(_self.slot)
 
+            // TODO rewrite to switch
             if iszero(len) {
                 return(filteredArray, 0x20)
             }
@@ -645,6 +658,7 @@ library Uint256Array {
         assembly {
             let len := sload(_self.slot)
 
+            // TODO rewrite to switch
             if iszero(len) {
                 return(findedValue, 0x20)
             }
@@ -734,6 +748,7 @@ library Uint256Array {
         assembly {
             let len := sload(_self.slot)
 
+            // TODO rewrite to switch
             if iszero(len) {
                 return(findedValue, 0x20)
             }
@@ -829,6 +844,7 @@ library Uint256Array {
                 revert(0x1c, 0x04)
             }
 
+            // TODO rewrite to switch
             if iszero(lt(indexTo, len)) {
                 // IndexDoesNotExist()
                 mstore(0x00, 0x2238ba58)
@@ -912,6 +928,7 @@ library Uint256Array {
                 revert(0x1c, 0x04)
             }
 
+            // TODO rewrite to switch
             if iszero(lt(indexTo, len)) {
                 // IndexDoesNotExist()
                 mstore(0x00, 0x2238ba58)
@@ -944,7 +961,97 @@ library Uint256Array {
             }
         }
     }
+
+    function map(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (uint256) callback,
+        uint256 calculationValue
+    ) internal view returns (uint256[] memory newArray) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        newArray = map(_self, callback, calculationValue, 0, indexTo);
+    }
+
+    function map(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (uint256) callback,
+        uint256 calculationValue,
+        uint256 indexFrom
+    ) internal view returns (uint256[] memory newArray) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        newArray = map(_self, callback, calculationValue, indexFrom, indexTo);
+    }
+
+    error ERROR(uint256 a);
+
+    function map(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (uint256) callback,
+        uint256 calculationValue,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal view returns (uint256[] memory newArray) {
+        bytes32 slot;
+        assembly {
+            let len := sload(_self.slot)
+
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
+                revert(0x1c, 0x04)
+            }
+
+            // TODO rewrite to switch
+            if iszero(lt(indexTo, len)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+
+            slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+            indexTo := add(indexTo, 0x01)
+            mstore(newArray, sub(indexTo, indexFrom))
+        }
+
+        bytes32 offset;
+        assembly {
+            offset := add(newArray, 0x20)
+        }
+
+        uint256 value;
+        for (; indexFrom < indexTo; ) {
+            assembly {
+                value := sload(slot)
+            }
+            value = callback(value, calculationValue);
+
+            assembly {
+                mstore(offset, value)
+                offset := add(offset, 0x20)
+                indexFrom := add(indexFrom, 0x01)
+                slot := add(slot, 0x01)
+            }
+        }
+
+        assembly {
+            mstore(0x40, offset)
+        }
+    }
 }
+
+// TODO helper
+// assembly {
+//     mstore(0x00, 0x7aa69c39)
+//     mstore(0x20, value)
+//     revert(0x1c, 0x44)
+// }
 
 // -----------------------------------------------------
 // callbacks
@@ -1039,7 +1146,7 @@ function mod(uint256 a, uint256 b) pure returns (uint256 result) {
     }
 }
 
-function exp(uint256 a, uint256 b) pure returns (uint256 result) {
+function pow(uint256 a, uint256 b) pure returns (uint256 result) {
     assembly {
         switch b
         case 0x00 {

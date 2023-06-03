@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import {console2, Test, stdStorage, StdStyle} from "forge-std/Test.sol";
 import {Solarray} from "solarray/Solarray.sol";
-import {Uint256Array, lt, lte, gt, gte, eq} from "src/Uint256Array.sol";
+import {Uint256Array, lt, lte, gt, gte, eq, add, sub, mul, div, mod, pow, xor} from "src/Uint256Array.sol";
 
 contract ArrayLibsTest is Test {
     using Uint256Array for *;
@@ -91,6 +91,22 @@ contract ArrayLibsTest is Test {
         u256.remove(6);
         logArray(u256, u256.length());
 
+        console2.logString("map");
+        console2.logString("----------------------------------------");
+        console2.logString("map: add 2 to all elements");
+        uint256[] memory mapRes = u256.map(add, 2);
+        logArray(mapRes);
+
+        console2.logString("----------------------------------------");
+        console2.logString("map: mul elements by 3 from 8 index");
+        mapRes = u256.map(mul, 3, 8);
+        logArray(mapRes);
+
+        console2.logString("----------------------------------------");
+        console2.logString("map: mod elements by 15 from 4 to 9 indexes");
+        mapRes = u256.map(mod, 15, 4, 9);
+        logArray(mapRes);
+
         // console2.logString("includes");
         // console2.log(
         //     "Non-existent element from the whole array: ",
@@ -166,8 +182,8 @@ contract ArrayLibsTest is Test {
         // res = u256.filter(gt, 2048);
         // logArray(res);
 
-        console2.logString("find/findLast & findIndex/findLastIndex");
-        console2.logString("----------------------------------------");
+        // console2.logString("find/findLast & findIndex/findLastIndex");
+        // console2.logString("----------------------------------------");
         // console2.logString("find first > 10");
         // uint256[] memory res = u256.find(gt, 10);
         // logArray(res);
@@ -192,29 +208,29 @@ contract ArrayLibsTest is Test {
         // res = u256.findLast(gt, 0, 0, 4);
         // logArray(res);
 
-        console2.logString("find index first > 10");
-        int256 index = u256.findIndex(gt, 10);
-        console2.logInt(index);
+        // console2.logString("find index first > 10");
+        // int256 index = u256.findIndex(gt, 10);
+        // console2.logInt(index);
 
-        console2.logString("find index first < 10 in range 5-last");
-        index = u256.findIndex(lt, 10, 5);
-        console2.logInt(index);
+        // console2.logString("find index first < 10 in range 5-last");
+        // index = u256.findIndex(lt, 10, 5);
+        // console2.logInt(index);
 
-        console2.logString("find index first > 0 in range 0-4");
-        index = u256.findIndex(gt, 0, 0, 4);
-        console2.logInt(index);
+        // console2.logString("find index first > 0 in range 0-4");
+        // index = u256.findIndex(gt, 0, 0, 4);
+        // console2.logInt(index);
 
-        console2.logString("find index last > 10");
-        index = u256.findLastIndex(gt, 10);
-        console2.logInt(index);
+        // console2.logString("find index last > 10");
+        // index = u256.findLastIndex(gt, 10);
+        // console2.logInt(index);
 
-        console2.logString("find index last < 10 in range 5-last");
-        index = u256.findLastIndex(lt, 10, 5);
-        console2.logInt(index);
+        // console2.logString("find index last < 10 in range 5-last");
+        // index = u256.findLastIndex(lt, 10, 5);
+        // console2.logInt(index);
 
-        console2.logString("find index last > 0 in range 0-4");
-        index = u256.findLastIndex(gt, 0, 0, 4);
-        console2.logInt(index);
+        // console2.logString("find index last > 0 in range 0-4");
+        // index = u256.findLastIndex(gt, 0, 0, 4);
+        // console2.logInt(index);
     }
 
     function logArray(
