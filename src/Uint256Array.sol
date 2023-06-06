@@ -5,6 +5,8 @@ pragma solidity ^0.8.0;
     [x] length
     [x] at
        - [x] negative index (from end)
+    [x] array
+       - [x] bounds
     [x] push
     [x] unshift
     [x] concat
@@ -79,6 +81,69 @@ library Uint256Array {
             }
 
             result := sload(add(sload(add(_self.slot, 0x01)), index))
+        }
+    }
+
+    function array(
+        CustomArray storage _self
+    ) internal view returns (uint256[] memory arr) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+        arr = array(_self, 0, indexTo);
+    }
+
+    function array(
+        CustomArray storage _self,
+        uint256 indexFrom
+    ) internal view returns (uint256[] memory arr) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+        arr = array(_self, indexFrom, indexTo);
+    }
+
+    function array(
+        CustomArray storage _self,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal view returns (uint256[] memory arr) {
+        assembly {
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
+                revert(0x1c, 0x04)
+            }
+
+            let len := sload(_self.slot)
+
+            if len {
+                // TODO rewrite to switch
+                if iszero(lt(indexTo, len)) {
+                    // IndexDoesNotExist()
+                    mstore(0x00, 0x2238ba58)
+                    revert(0x1c, 0x04)
+                }
+                arr := mload(0x40)
+                let offset := add(arr, 0x20)
+
+                for {
+                    indexTo := add(indexTo, 0x01)
+                    mstore(arr, sub(indexTo, indexFrom))
+                    let slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+                    let value
+                } lt(indexFrom, indexTo) {
+                    indexFrom := add(indexFrom, 0x01)
+                    slot := add(slot, 0x01)
+                    offset := add(offset, 0x20)
+                } {
+                    mstore(offset, sload(slot))
+                }
+
+                mstore(0x40, add(offset, 0x20))
+            }
         }
     }
 
@@ -1044,6 +1109,76 @@ library Uint256Array {
             mstore(0x40, offset)
         }
     }
+
+    function forEach(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (uint256) callback,
+        uint256 calculationValue
+    ) internal {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        forEach(_self, callback, calculationValue, 0, indexTo);
+    }
+
+    function forEach(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (uint256) callback,
+        uint256 calculationValue,
+        uint256 indexFrom
+    ) internal {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        forEach(_self, callback, calculationValue, indexFrom, indexTo);
+    }
+
+    function forEach(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (uint256) callback,
+        uint256 calculationValue,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal {
+        bytes32 slot;
+        assembly {
+            let len := sload(_self.slot)
+
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
+                revert(0x1c, 0x04)
+            }
+
+            // TODO rewrite to switch
+            if iszero(lt(indexTo, len)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+
+            slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+            indexTo := add(indexTo, 0x01)
+        }
+
+        uint256 value;
+        for (; indexFrom < indexTo; ) {
+            assembly {
+                value := sload(slot)
+            }
+            value = callback(value, calculationValue);
+
+            assembly {
+                sstore(slot, value)
+                indexFrom := add(indexFrom, 0x01)
+                slot := add(slot, 0x01)
+            }
+        }
+    }
 }
 
 // TODO helper
@@ -1184,7 +1319,7 @@ function pow(uint256 a, uint256 b) pure returns (uint256 result) {
 
                     for {
                         let one := helper
-                    } 1 {
+                    } one {
 
                     } {
                         if gt(a, div(maxUint256, a)) {
@@ -1193,17 +1328,17 @@ function pow(uint256 a, uint256 b) pure returns (uint256 result) {
                         }
 
                         switch and(b, one)
+                        case 0x00 {
+                            b := shr(one, b)
+                        }
                         case 0x01 {
                             helper := mul(a, helper)
                             b := shr(one, b)
-                            a := mul(a, a)
-                        }
-                        default {
-                            b := shr(one, b)
-                            a := mul(a, a)
                         }
 
-                        if gt(helper, b) {
+                        a := mul(a, a)
+
+                        if gt(b, one) {
                             continue
                         }
 
