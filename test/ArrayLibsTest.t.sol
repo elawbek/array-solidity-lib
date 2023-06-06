@@ -16,235 +16,294 @@ contract ArrayLibsTest is Test {
         }
     }
 
-    function testUint256() external {
-        uint256[] memory arr = Solarray.uint256s(
-            type(uint8).max,
-            type(uint16).max,
-            type(uint24).max
-        );
+    function testLength() external {
+        u256.push(1);
+        assertEq(u256.length(), 1);
 
-        uint256[] memory arr2 = Solarray.uint256s(
-            type(uint32).max,
-            type(uint40).max,
-            type(uint48).max,
-            type(uint56).max
-        );
+        u256.unshift(2);
+        assertEq(u256.length(), 2);
 
-        console2.logString("push1");
-        u256.push(arr[0]);
-        logArray(u256, u256.length());
+        u256.pop();
+        assertEq(u256.length(), 1);
 
-        console2.logString("push2");
-        u256.push(arr[0], arr[1]);
-        logArray(u256, u256.length());
-
-        console2.logString("push3");
-        u256.push(arr[0], arr[1], arr[2]);
-        logArray(u256, u256.length());
-
-        console2.logString("unshift1");
-        u256.unshift(arr[0]);
-        logArray(u256, u256.length());
-
-        console2.logString("unshift2");
-        u256.unshift(arr[0], arr[1]);
-        logArray(u256, u256.length());
-
-        console2.logString("unshift3");
-        u256.unshift(arr[0], arr[1], arr[2]);
-        logArray(u256, u256.length());
-
-        console2.logString("shift");
-        uint256 val = u256.shift();
-        console2.logUint(val);
-        logArray(u256, u256.length());
-
-        console2.logString("pop");
-        val = u256.pop();
-        console2.logUint(val);
-        logArray(u256, u256.length());
-
-        console2.logString("concat");
-        u256.concat(arr2);
-        logArray(u256, u256.length());
-
-        console2.logString("fill0");
-        u256.fill(0);
-        logArray(u256, u256.length());
-
-        console2.logString("fill3 from 2");
-        u256.fill(3, 2);
-        logArray(u256, u256.length());
-
-        console2.logString("fill10 from 5 to 9");
-        u256.fill(10, 5, 10);
-        logArray(u256, u256.length());
-
-        console2.logString("update 4 and 9 and 12");
-        u256.update(4, 2048);
-        u256.update(-5, 2048);
-        u256.update(-2, 2048);
-        logArray(u256, u256.length());
-
-        console2.logString("remove 4, 6");
-        u256.remove(4);
-        u256.remove(6);
-        logArray(u256, u256.length());
-
-        console2.logString("map");
-        console2.logString("----------------------------------------");
-        console2.logString("map: add 2 to all elements");
-        uint256[] memory mapRes = u256.map(add, 2);
-        logArray(mapRes);
-
-        console2.logString("----------------------------------------");
-        console2.logString("map: mul elements by 3 from 8 index");
-        mapRes = u256.map(mul, 3, 8);
-        logArray(mapRes);
-
-        console2.logString("----------------------------------------");
-        console2.logString("map: mod elements by 15 from 4 to 9 indexes");
-        mapRes = u256.map(mod, 15, 4, 9);
-        logArray(mapRes);
-
-        // console2.logString("includes");
-        // console2.log(
-        //     "Non-existent element from the whole array: ",
-        //     u256.includes(1)
-        // );
-        // console2.log(
-        //     "Non-existent element from 4 index: ",
-        //     u256.includes(0, 4)
-        // );
-        // console2.log(
-        //     "Non-existent element from 5 to 10 indexes: ",
-        //     u256.includes(3, 5, 10)
-        // );
-        // console2.log("Element from the whole array :", u256.includes(2048));
-        // console2.log("Element from 8 index :", u256.includes(2048, 8));
-        // console2.log(
-        //     "Element from 7 to 9 indexes :",
-        //     u256.includes(2048, 7, 9)
-        // );
-        // console2.logString("----------------------------------------");
-
-        // console2.logString("indexOf");
-        // console2.log(
-        //     "Non-existent element from the whole array: ",
-        //     u256.indexOf(1)
-        // );
-        // console2.log("Non-existent element from 2 index: ", u256.indexOf(0, 4));
-        // console2.log(
-        //     "Non-existent element from 5 to 10 indexes: ",
-        //     u256.indexOf(3, 5, 10)
-        // );
-        // console2.log("Element from the whole array :", u256.indexOf(2048));
-        // console2.log("Element from 8 index :", u256.indexOf(2048, 8));
-        // console2.log("Element from 7 to 9 indexes :", u256.indexOf(2048, 7, 9));
-        // console2.logString("----------------------------------------");
-
-        // console2.logString("lastIndexOf");
-        // console2.log(
-        //     "Non-existent element from the whole array: ",
-        //     u256.lastIndexOf(1)
-        // );
-        // console2.log(
-        //     "Non-existent element from 2 index: ",
-        //     u256.lastIndexOf(0, 4)
-        // );
-        // console2.log(
-        //     "Non-existent element from 5 to 10 indexes: ",
-        //     u256.lastIndexOf(3, 5, 10)
-        // );
-        // console2.log("Element from the whole array :", u256.lastIndexOf(2048));
-        // console2.log("Element from 8 index :", u256.lastIndexOf(2048, 8));
-        // console2.log(
-        //     "Element from 7 to 9 indexes :",
-        //     u256.lastIndexOf(2048, 7, 9)
-        // );
-        // console2.logString("----------------------------------------");
-
-        // console2.logString("filter");
-        // console2.logString("----------------------------------------");
-        // console2.logString("Filter elems lt 42");
-        // uint256[] memory res = u256.filter(lt, 42);
-        // logArray(res);
-
-        // console2.logString("Filter elems gt 5 from 3 index");
-        // res = u256.filter(gt, 5, 3);
-        // logArray(res);
-
-        // console2.logString("Filter elems eq 3 from 4 to 9 indexes");
-        // res = u256.filter(eq, 3, 4, 11);
-        // logArray(res);
-
-        // console2.logString("Empty array");
-        // res = u256.filter(gt, 2048);
-        // logArray(res);
-
-        // console2.logString("find/findLast & findIndex/findLastIndex");
-        // console2.logString("----------------------------------------");
-        // console2.logString("find first > 10");
-        // uint256[] memory res = u256.find(gt, 10);
-        // logArray(res);
-
-        // console2.logString("find first < 10 in range 5-last");
-        // res = u256.find(lt, 10, 5);
-        // logArray(res);
-
-        // console2.logString("find first > 0 in range 0-4");
-        // res = u256.find(gt, 0, 0, 4);
-        // logArray(res);
-
-        // console2.logString("find last > 10");
-        // res = u256.findLast(gt, 10);
-        // logArray(res);
-
-        // console2.logString("find last < 10 in range 5-last");
-        // res = u256.findLast(lt, 10, 5);
-        // logArray(res);
-
-        // console2.logString("find last > 0 in range 0-4");
-        // res = u256.findLast(gt, 0, 0, 4);
-        // logArray(res);
-
-        // console2.logString("find index first > 10");
-        // int256 index = u256.findIndex(gt, 10);
-        // console2.logInt(index);
-
-        // console2.logString("find index first < 10 in range 5-last");
-        // index = u256.findIndex(lt, 10, 5);
-        // console2.logInt(index);
-
-        // console2.logString("find index first > 0 in range 0-4");
-        // index = u256.findIndex(gt, 0, 0, 4);
-        // console2.logInt(index);
-
-        // console2.logString("find index last > 10");
-        // index = u256.findLastIndex(gt, 10);
-        // console2.logInt(index);
-
-        // console2.logString("find index last < 10 in range 5-last");
-        // index = u256.findLastIndex(lt, 10, 5);
-        // console2.logInt(index);
-
-        // console2.logString("find index last > 0 in range 0-4");
-        // index = u256.findLastIndex(gt, 0, 0, 4);
-        // console2.logInt(index);
+        u256.shift();
+        assertEq(u256.length(), 0);
     }
 
-    function logArray(
-        Uint256Array.CustomArray storage array,
-        uint256 length
-    ) private view {
-        console2.log("length: ", length);
+    function testAt() external {
+        uint256[] memory expectedArray = Solarray.uint256s(
+            type(uint8).max,
+            type(uint16).max,
+            type(uint24).max,
+            type(uint32).max
+        );
+        u256.concat(expectedArray);
 
-        int i;
-        while (abs(i) < length) {
-            console2.log("index: %s, elem: %s", abs(i), array.at(i));
-            ++i;
+        uint256[] memory arr = new uint256[](expectedArray.length);
+
+        int256 index;
+        for (uint256 i; i < arr.length; ++i) {
+            arr[i] = u256.at(index);
+            ++index;
         }
-        console2.logString("----------------------------------------");
+
+        assertArray(arr, expectedArray);
+
+        expectedArray = Solarray.uint256s(
+            type(uint32).max,
+            type(uint24).max,
+            type(uint16).max,
+            type(uint8).max
+        );
+
+        index = -1;
+        for (uint256 i; i < arr.length; ++i) {
+            arr[i] = u256.at(index);
+            --index;
+        }
+
+        assertArray(arr, expectedArray);
+    }
+
+    function testArray() external {
+        uint256[] memory expectedArray;
+        uint256[] memory arr;
+
+        // Empty array
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+
+        expectedArray = Solarray.uint256s(
+            type(uint40).max,
+            type(uint48).max,
+            type(uint56).max,
+            type(uint64).max
+        );
+        u256.concat(expectedArray);
+
+        // Full array
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+
+        // From 2nd index to end of array
+        expectedArray = Solarray.uint256s(type(uint56).max, type(uint64).max);
+        arr = u256.array(2);
+        assertArray(arr, expectedArray);
+
+        // From 1st to 2nd index
+        expectedArray = Solarray.uint256s(type(uint48).max, type(uint56).max);
+        arr = u256.array(1, 2);
+        assertArray(arr, expectedArray);
+    }
+
+    function testPush() external {
+        uint256[] memory expectedArray;
+        uint256[] memory arr;
+
+        expectedArray = Solarray.uint256s(type(uint72).max);
+        // Push one element
+        u256.push(type(uint72).max);
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+
+        expectedArray = Solarray.uint256s(
+            type(uint72).max,
+            type(uint80).max,
+            type(uint88).max
+        );
+        // Push two elements
+        u256.push(type(uint80).max, type(uint88).max);
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+
+        expectedArray = Solarray.uint256s(
+            type(uint72).max,
+            type(uint80).max,
+            type(uint88).max,
+            type(uint96).max,
+            type(uint104).max,
+            type(uint112).max
+        );
+        // Push three elements
+        u256.push(type(uint96).max, type(uint104).max, type(uint112).max);
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+    }
+
+    function testUnshift() external {
+        uint256[] memory expectedArray;
+        uint256[] memory arr;
+
+        expectedArray = Solarray.uint256s(type(uint72).max);
+        // Push one element
+        u256.unshift(type(uint72).max);
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+
+        expectedArray = Solarray.uint256s(
+            type(uint80).max,
+            type(uint88).max,
+            type(uint72).max
+        );
+        // Push two elements
+        u256.unshift(type(uint80).max, type(uint88).max);
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+
+        expectedArray = Solarray.uint256s(
+            type(uint96).max,
+            type(uint104).max,
+            type(uint112).max,
+            type(uint80).max,
+            type(uint88).max,
+            type(uint72).max
+        );
+        // Push three elements
+        u256.unshift(type(uint96).max, type(uint104).max, type(uint112).max);
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+    }
+
+    function testConcat() external {
+        uint256[] memory expectedArray;
+        uint256[] memory arr;
+
+        expectedArray = Solarray.uint256s(type(uint120).max, type(uint128).max);
+        // Concat two elements
+        u256.concat(expectedArray);
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+
+        // Concat another two elements
+        expectedArray = Solarray.uint256s(type(uint136).max, type(uint144).max);
+        u256.concat(expectedArray);
+
+        expectedArray = Solarray.uint256s(
+            type(uint120).max,
+            type(uint128).max,
+            type(uint136).max,
+            type(uint144).max
+        );
+
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+    }
+
+    function testPopAndShift() external {
+        uint256[] memory expectedArray;
+        uint256[] memory arr;
+
+        expectedArray = Solarray.uint256s(
+            type(uint152).max,
+            type(uint160).max,
+            type(uint168).max,
+            type(uint176).max
+        );
+        u256.concat(expectedArray);
+
+        uint256 expectedValue = expectedArray[3];
+
+        expectedArray = Solarray.uint256s(
+            type(uint152).max,
+            type(uint160).max,
+            type(uint168).max
+        );
+
+        // pop
+        uint256 removedValue = u256.pop();
+        arr = u256.array();
+        assertEq(removedValue, expectedValue);
+        assertArray(arr, expectedArray);
+
+        // shift
+        expectedValue = expectedArray[0];
+        expectedArray = Solarray.uint256s(type(uint160).max, type(uint168).max);
+
+        removedValue = u256.shift();
+        arr = u256.array();
+        assertEq(removedValue, expectedValue);
+        assertArray(arr, expectedArray);
+    }
+
+    function testUpdate() external {
+        uint256[] memory expectedArray;
+        uint256[] memory arr;
+
+        expectedArray = Solarray.uint256s(
+            type(uint184).max,
+            type(uint192).max,
+            type(uint200).max,
+            type(uint208).max
+        );
+        u256.concat(expectedArray);
+
+        expectedArray = Solarray.uint256s(
+            type(uint184).max,
+            type(uint8).max,
+            type(uint200).max,
+            type(uint208).max
+        );
+
+        // update 1st index to type(uint8).max
+        u256.update(1, type(uint8).max);
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+
+        expectedArray = Solarray.uint256s(
+            type(uint184).max,
+            type(uint8).max,
+            type(uint16).max,
+            type(uint208).max
+        );
+
+        // update -2nd index to type(uint16).max
+        u256.update(-2, type(uint16).max);
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+    }
+
+    function testRemove() external {
+        uint256[] memory expectedArray;
+        uint256[] memory arr;
+
+        expectedArray = Solarray.uint256s(
+            type(uint216).max,
+            type(uint224).max,
+            type(uint232).max,
+            type(uint240).max
+        );
+        u256.concat(expectedArray);
+
+        expectedArray = Solarray.uint256s(
+            type(uint216).max,
+            type(uint240).max,
+            type(uint232).max
+        );
+
+        // remove 1st index
+        u256.remove(1);
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+
+        expectedArray = Solarray.uint256s(type(uint216).max, type(uint232).max);
+
+        // remove -2nd index
+        u256.remove(-2);
+        arr = u256.array();
+        assertArray(arr, expectedArray);
+    }
+
+    function assertArray(
+        uint256[] memory arr,
+        uint256[] memory expectedArray
+    ) private {
+        logArray(arr);
+
+        assertEq(arr.length, expectedArray.length);
+
+        for (uint256 i; i < arr.length; ++i) {
+            assertEq(arr[i], expectedArray[i]);
+        }
     }
 
     function logArray(uint256[] memory array) private view {
@@ -256,9 +315,5 @@ contract ArrayLibsTest is Test {
             ++i;
         }
         console2.logString("----------------------------------------");
-    }
-
-    function abs(int value) private pure returns (uint256) {
-        return value >= 0 ? uint256(value) : uint256(-value);
     }
 }
