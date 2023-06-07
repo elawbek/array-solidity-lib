@@ -16,7 +16,9 @@ pragma solidity ^0.8.0;
     [x] remove
     [x] includes
         - [x] bounds
-    [x] fill
+    [] fill
+        - [x] bounds
+        - [] return modified array
     [x] indexOf & lastIndexOf
        - [x] bounds
     [x] filter
@@ -43,6 +45,8 @@ pragma solidity ^0.8.0;
        - [] callbacks
        - [] bounds
     [] sort(???)
+    [] every
+       - [] bounds
  */
 
 library Uint256Array {
@@ -410,6 +414,7 @@ library Uint256Array {
         }
     }
 
+    // TODO return the modified array instead of rewrite state
     function fill(CustomArray storage _self, uint256 value) internal {
         uint256 indexTo;
         assembly {
