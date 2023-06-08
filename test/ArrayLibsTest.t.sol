@@ -67,11 +67,9 @@ contract ArrayLibsTest is Test {
 
     function testArray() external {
         uint256[] memory expectedArray;
-        uint256[] memory arr;
 
         // Empty array
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint40).max,
@@ -82,29 +80,24 @@ contract ArrayLibsTest is Test {
         u256.concat(expectedArray);
 
         // Full array
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
 
         // From 2nd index to end of array
         expectedArray = Solarray.uint256s(type(uint56).max, type(uint64).max);
-        arr = u256.array(2);
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(2), expectedArray);
 
         // From 1st to 2nd index
         expectedArray = Solarray.uint256s(type(uint48).max, type(uint56).max);
-        arr = u256.array(1, 2);
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(1, 2), expectedArray);
     }
 
     function testPush() external {
         uint256[] memory expectedArray;
-        uint256[] memory arr;
 
         expectedArray = Solarray.uint256s(type(uint72).max);
         // Push one element
         u256.push(type(uint72).max);
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint72).max,
@@ -113,8 +106,7 @@ contract ArrayLibsTest is Test {
         );
         // Push two elements
         u256.push(type(uint80).max, type(uint88).max);
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint72).max,
@@ -126,19 +118,16 @@ contract ArrayLibsTest is Test {
         );
         // Push three elements
         u256.push(type(uint96).max, type(uint104).max, type(uint112).max);
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
     }
 
     function testUnshift() external {
         uint256[] memory expectedArray;
-        uint256[] memory arr;
 
         expectedArray = Solarray.uint256s(type(uint72).max);
         // Push one element
         u256.unshift(type(uint72).max);
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint80).max,
@@ -147,8 +136,7 @@ contract ArrayLibsTest is Test {
         );
         // Push two elements
         u256.unshift(type(uint80).max, type(uint88).max);
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint96).max,
@@ -160,19 +148,16 @@ contract ArrayLibsTest is Test {
         );
         // Push three elements
         u256.unshift(type(uint96).max, type(uint104).max, type(uint112).max);
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
     }
 
     function testConcat() external {
         uint256[] memory expectedArray;
-        uint256[] memory arr;
 
         expectedArray = Solarray.uint256s(type(uint120).max, type(uint128).max);
         // Concat two elements
         u256.concat(expectedArray);
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
 
         // Concat another two elements
         expectedArray = Solarray.uint256s(type(uint136).max, type(uint144).max);
@@ -185,13 +170,11 @@ contract ArrayLibsTest is Test {
             type(uint144).max
         );
 
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
     }
 
     function testPopAndShift() external {
         uint256[] memory expectedArray;
-        uint256[] memory arr;
 
         expectedArray = Solarray.uint256s(
             type(uint152).max,
@@ -210,24 +193,19 @@ contract ArrayLibsTest is Test {
         );
 
         // pop
-        uint256 removedValue = u256.pop();
-        arr = u256.array();
-        assertEq(removedValue, expectedValue);
-        assertArray(arr, expectedArray);
+        assertEq(u256.pop(), expectedValue);
+        assertArray(u256.array(), expectedArray);
 
         // shift
         expectedValue = expectedArray[0];
         expectedArray = Solarray.uint256s(type(uint160).max, type(uint168).max);
 
-        removedValue = u256.shift();
-        arr = u256.array();
-        assertEq(removedValue, expectedValue);
-        assertArray(arr, expectedArray);
+        assertEq(u256.shift(), expectedValue);
+        assertArray(u256.array(), expectedArray);
     }
 
     function testUpdate() external {
         uint256[] memory expectedArray;
-        uint256[] memory arr;
 
         expectedArray = Solarray.uint256s(
             type(uint184).max,
@@ -246,8 +224,7 @@ contract ArrayLibsTest is Test {
 
         // update 1st index to type(uint8).max
         u256.update(1, type(uint8).max);
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint184).max,
@@ -258,13 +235,11 @@ contract ArrayLibsTest is Test {
 
         // update -2nd index to type(uint16).max
         u256.update(-2, type(uint16).max);
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
     }
 
     function testRemove() external {
         uint256[] memory expectedArray;
-        uint256[] memory arr;
 
         expectedArray = Solarray.uint256s(
             type(uint216).max,
@@ -282,15 +257,13 @@ contract ArrayLibsTest is Test {
 
         // remove 1st index
         u256.remove(1);
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
 
         expectedArray = Solarray.uint256s(type(uint216).max, type(uint232).max);
 
         // remove -2nd index
         u256.remove(-2);
-        arr = u256.array();
-        assertArray(arr, expectedArray);
+        assertArray(u256.array(), expectedArray);
     }
 
     function testIncludes() external {
@@ -329,7 +302,6 @@ contract ArrayLibsTest is Test {
     // TODO return the modified array instead of rewrite state
     function testFill() external {
         uint256[] memory expectedArray;
-        // uint256[] memory arr;
 
         expectedArray = Solarray.uint256s(
             type(uint24).max,
@@ -338,8 +310,6 @@ contract ArrayLibsTest is Test {
             type(uint48).max
         );
         u256.concat(expectedArray);
-
-        // fill all array to
     }
 
     function testIndexOfAndLastIndexOf() external {
@@ -353,23 +323,157 @@ contract ArrayLibsTest is Test {
         );
         u256.concat(expectedArray);
 
-        // find in all array
+        // find index in all array
         assertEq(u256.indexOf(type(uint56).max), 0);
         assertEq(u256.indexOf(type(uint64).max), 1);
         assertEq(u256.lastIndexOf(type(uint56).max), 3);
         assertEq(u256.lastIndexOf(type(uint64).max), 2);
 
-        // find from 1st index to the of end array
+        // find index from 1st index to the of end array
         assertEq(u256.indexOf(type(uint56).max, 1), 3);
         assertEq(u256.indexOf(type(uint64).max, 1), 1);
         assertEq(u256.lastIndexOf(type(uint56).max, 1), 3);
         assertEq(u256.lastIndexOf(type(uint64).max, 1), 2);
 
-        // find from 1st index to 2nd
+        // find index from 1st index to 2nd
         assertEq(u256.indexOf(type(uint56).max, 1, 2), -1);
         assertEq(u256.indexOf(type(uint64).max, 1, 2), 1);
         assertEq(u256.lastIndexOf(type(uint56).max, 1, 2), -1);
         assertEq(u256.lastIndexOf(type(uint64).max, 1, 2), 2);
+    }
+
+    function testFilter() external {
+        uint256[] memory expectedArray;
+
+        expectedArray = Solarray.uint256s(
+            type(uint72).max,
+            type(uint80).max,
+            type(uint88).max,
+            type(uint96).max,
+            type(uint104).max,
+            type(uint112).max
+        );
+        u256.concat(expectedArray);
+
+        // filter lt uint104 in all array
+        expectedArray = Solarray.uint256s(
+            type(uint72).max,
+            type(uint80).max,
+            type(uint88).max,
+            type(uint96).max
+        );
+        assertArray(u256.filter(lt, type(uint104).max), expectedArray);
+
+        // filter lt uint104 in array from 3rd index to the end
+        expectedArray = Solarray.uint256s(type(uint96).max);
+        assertArray(u256.filter(lt, type(uint104).max, 3), expectedArray);
+
+        // filter lt uint104 in array from 2nd index to 4th
+        expectedArray = Solarray.uint256s(type(uint88).max, type(uint96).max);
+        assertArray(u256.filter(lt, type(uint104).max, 2, 4), expectedArray);
+
+        // filter gt uint88 in all array
+        expectedArray = Solarray.uint256s(
+            type(uint96).max,
+            type(uint104).max,
+            type(uint112).max
+        );
+        assertArray(u256.filter(gt, type(uint88).max), expectedArray);
+
+        // filter gt uint88 in array from 4th index to the end
+        expectedArray = Solarray.uint256s(type(uint104).max, type(uint112).max);
+        assertArray(u256.filter(gt, type(uint88).max, 4), expectedArray);
+
+        // filter gt uint88 in array from 0 index to 2th
+        assembly {
+            mstore(expectedArray, 0x00)
+        }
+        assertArray(u256.filter(gt, type(uint88).max, 0, 2), expectedArray);
+    }
+
+    function testFindAndFindLast() external {
+        uint256[] memory expectedArray;
+
+        expectedArray = Solarray.uint256s(
+            type(uint120).max,
+            type(uint128).max,
+            type(uint136).max,
+            type(uint144).max,
+            type(uint136).max,
+            type(uint128).max,
+            type(uint120).max
+        );
+        u256.concat(expectedArray);
+
+        expectedArray = Solarray.uint256s(type(uint136).max);
+        // find elem eq uint136 in all array
+        assertArray(u256.find(eq, type(uint136).max), expectedArray);
+        assertArray(u256.findLast(eq, type(uint136).max), expectedArray);
+
+        // find elem eq uint136 in array from 3rd index to the end
+        assertArray(u256.find(eq, type(uint136).max, 3), expectedArray);
+        assertArray(u256.findLast(eq, type(uint136).max, 3), expectedArray);
+
+        // find elem eq uint136 in array from 5th index to 6th
+        assembly {
+            mstore(expectedArray, 0x00)
+        }
+        assertArray(u256.find(eq, type(uint136).max, 5, 6), expectedArray);
+        assertArray(u256.findLast(eq, type(uint136).max, 5, 6), expectedArray);
+    }
+
+    function testFindIndexAndFindLastIndex() external {
+        uint256[] memory expectedArray;
+
+        expectedArray = Solarray.uint256s(
+            type(uint152).max,
+            type(uint160).max,
+            type(uint168).max,
+            type(uint176).max,
+            type(uint168).max,
+            type(uint160).max,
+            type(uint152).max
+        );
+        u256.concat(expectedArray);
+
+        // find elem gte uint160 in all array
+        assertEq(u256.findIndex(gte, type(uint160).max), 1);
+        assertEq(u256.findLastIndex(gte, type(uint160).max), 5);
+
+        // find elem gte uint160 in array from 3rd index to the end
+        assertEq(u256.findIndex(gte, type(uint160).max, 3), 3);
+        assertEq(u256.findLastIndex(gte, type(uint160).max, 3), 5);
+
+        // find elem gte uint160 in array from 5th index to 6th
+        assertEq(u256.findIndex(gte, type(uint160).max, 5, 6), 5);
+        assertEq(u256.findLastIndex(gte, type(uint160).max, 5, 6), 5);
+
+        // // find elem lte uint176 in all array
+        assertEq(u256.findIndex(lte, type(uint176).max), 0);
+        assertEq(u256.findLastIndex(lte, type(uint176).max), 6);
+
+        // // find elem lte uint176 in array from 3rd index to the end
+        assertEq(u256.findIndex(lte, type(uint176).max, 3), 3);
+        assertEq(u256.findLastIndex(lte, type(uint176).max, 3), 6);
+
+        // // find elem lte uint176 in array from 5th index to 6th
+        assertEq(u256.findIndex(lte, type(uint176).max, 5, 6), 5);
+        assertEq(u256.findLastIndex(lte, type(uint176).max, 5, 6), 6);
+    }
+
+    function testMap() external {
+        uint256[] memory expectedArray;
+
+        expectedArray = Solarray.uint256s(
+            type(uint184).max,
+            type(uint192).max,
+            type(uint200).max,
+            type(uint208).max,
+            type(uint216).max,
+            type(uint224).max,
+            type(uint232).max
+        );
+        u256.concat(expectedArray);
     }
 
     function assertArray(
