@@ -5,8 +5,7 @@ pragma solidity ^0.8.0;
     [x] length
     [x] at
        - [x] negative index (from end)
-    [x] array
-       - [x] bounds
+    [x] slice
     [x] push
     [x] unshift
     [x] concat
@@ -35,11 +34,8 @@ pragma solidity ^0.8.0;
     [x] forEach
        - [x] add, sub, mul, div, mod, pow, xor
        - [x] bounds
-    [] reverse (???)
-       - [] (?)
-       - [] bounds
-    [] slice(?)
-       - [] negative index (from end)
+    [x] reverse
+       - [x] bounds
     [] some(?)
        - [] callbacks
        - [] bounds
@@ -87,17 +83,17 @@ library Uint256Array {
         }
     }
 
-    function array(
+    function slice(
         CustomArray storage _self
     ) internal view returns (uint256[] memory arr) {
         uint256 indexTo;
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
-        arr = array(_self, 0, indexTo);
+        arr = slice(_self, 0, indexTo);
     }
 
-    function array(
+    function slice(
         CustomArray storage _self,
         uint256 indexFrom
     ) internal view returns (uint256[] memory arr) {
@@ -105,10 +101,10 @@ library Uint256Array {
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
-        arr = array(_self, indexFrom, indexTo);
+        arr = slice(_self, indexFrom, indexTo);
     }
 
-    function array(
+    function slice(
         CustomArray storage _self,
         uint256 indexFrom,
         uint256 indexTo
@@ -1181,6 +1177,72 @@ library Uint256Array {
                 sstore(slot, value)
                 indexFrom := add(indexFrom, 0x01)
                 slot := add(slot, 0x01)
+            }
+        }
+    }
+
+    function reverse(CustomArray storage _self) internal {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        reverse(_self, 0, indexTo);
+    }
+
+    function reverse(CustomArray storage _self, uint256 indexFrom) internal {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        reverse(_self, indexFrom, indexTo);
+    }
+
+    function reverse(
+        CustomArray storage _self,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal {
+        assembly {
+            let len := sload(_self.slot)
+
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
+                revert(0x1c, 0x04)
+            }
+
+            // TODO rewrite to switch
+            if iszero(lt(indexTo, len)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+
+            len := add(sub(indexTo, indexFrom), 0x01)
+            switch and(len, 0x01)
+            case 0x00 {
+                len := shr(0x01, len)
+            }
+            case 0x01 {
+                len := shr(0x01, sub(len, 0x01))
+            }
+
+            for {
+                let slot := sload(add(_self.slot, 0x01))
+                let slotIndexFrom := add(slot, indexFrom)
+                let slotIndexTo := add(slot, indexTo)
+
+                let value
+            } len {
+                len := sub(len, 0x01)
+                slotIndexFrom := add(slotIndexFrom, 0x01)
+                slotIndexTo := sub(slotIndexTo, 0x01)
+            } {
+                value := sload(slotIndexFrom)
+                sstore(slotIndexFrom, sload(slotIndexTo))
+                sstore(slotIndexTo, value)
             }
         }
     }

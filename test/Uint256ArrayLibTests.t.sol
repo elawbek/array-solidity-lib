@@ -6,7 +6,7 @@ import {Solarray} from "solarray/Solarray.sol";
 import {Uint256Array, lt, lte, gt, gte, eq, add, sub, mul, div, mod, pow, xor} from "src/Uint256Array.sol";
 import {RevertTesterHelperU256} from "./RevertTesterHelperU256.sol";
 
-contract ArrayLibsTest is Test {
+contract Uint256ArrayLibTests is Test {
     using Uint256Array for *;
 
     Uint256Array.CustomArray private u256;
@@ -72,7 +72,7 @@ contract ArrayLibsTest is Test {
         uint256[] memory expectedArray;
 
         // Empty array
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint40).max,
@@ -83,15 +83,15 @@ contract ArrayLibsTest is Test {
         u256.concat(expectedArray);
 
         // Full array
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         // From 2nd index to end of array
         expectedArray = Solarray.uint256s(type(uint56).max, type(uint64).max);
-        assertArray(u256.array(2), expectedArray);
+        assertArray(u256.slice(2), expectedArray);
 
         // From 1st to 2nd index
         expectedArray = Solarray.uint256s(type(uint48).max, type(uint56).max);
-        assertArray(u256.array(1, 2), expectedArray);
+        assertArray(u256.slice(1, 2), expectedArray);
     }
 
     function testPush() external {
@@ -100,7 +100,7 @@ contract ArrayLibsTest is Test {
         expectedArray = Solarray.uint256s(type(uint72).max);
         // Push one element
         u256.push(type(uint72).max);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint72).max,
@@ -109,7 +109,7 @@ contract ArrayLibsTest is Test {
         );
         // Push two elements
         u256.push(type(uint80).max, type(uint88).max);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint72).max,
@@ -121,7 +121,7 @@ contract ArrayLibsTest is Test {
         );
         // Push three elements
         u256.push(type(uint96).max, type(uint104).max, type(uint112).max);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
     }
 
     function testUnshift() external {
@@ -130,7 +130,7 @@ contract ArrayLibsTest is Test {
         expectedArray = Solarray.uint256s(type(uint72).max);
         // Push one element
         u256.unshift(type(uint72).max);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint80).max,
@@ -139,7 +139,7 @@ contract ArrayLibsTest is Test {
         );
         // Push two elements
         u256.unshift(type(uint80).max, type(uint88).max);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint96).max,
@@ -151,7 +151,7 @@ contract ArrayLibsTest is Test {
         );
         // Push three elements
         u256.unshift(type(uint96).max, type(uint104).max, type(uint112).max);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
     }
 
     function testConcat() external {
@@ -160,7 +160,7 @@ contract ArrayLibsTest is Test {
         expectedArray = Solarray.uint256s(type(uint120).max, type(uint128).max);
         // Concat two elements
         u256.concat(expectedArray);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         // Concat another two elements
         expectedArray = Solarray.uint256s(type(uint136).max, type(uint144).max);
@@ -173,7 +173,7 @@ contract ArrayLibsTest is Test {
             type(uint144).max
         );
 
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
     }
 
     function testPopAndShift() external {
@@ -197,14 +197,14 @@ contract ArrayLibsTest is Test {
 
         // pop
         assertEq(u256.pop(), expectedValue);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         // shift
         expectedValue = expectedArray[0];
         expectedArray = Solarray.uint256s(type(uint160).max, type(uint168).max);
 
         assertEq(u256.shift(), expectedValue);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
     }
 
     function testUpdate() external {
@@ -227,7 +227,7 @@ contract ArrayLibsTest is Test {
 
         // update 1st index to type(uint8).max
         u256.update(1, type(uint8).max);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         expectedArray = Solarray.uint256s(
             type(uint184).max,
@@ -238,7 +238,7 @@ contract ArrayLibsTest is Test {
 
         // update -2nd index to type(uint16).max
         u256.update(-2, type(uint16).max);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
     }
 
     function testRemove() external {
@@ -260,13 +260,13 @@ contract ArrayLibsTest is Test {
 
         // remove 1st index
         u256.remove(1);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         expectedArray = Solarray.uint256s(type(uint216).max, type(uint232).max);
 
         // remove -2nd index
         u256.remove(-2);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
     }
 
     function testIncludes() external {
@@ -316,17 +316,17 @@ contract ArrayLibsTest is Test {
         // fill all array by 2
         expectedArray = Solarray.uint256s(2, 2, 2, 2);
         u256.fillState(2);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         // fill array from 2nd index to the end by 10000
         expectedArray = Solarray.uint256s(2, 2, 10000, 10000);
         u256.fillState(10000, 2);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
 
         // fill array from 1st index to 2nd by 100
         expectedArray = Solarray.uint256s(2, 100, 100, 10000);
         u256.fillState(100, 1, 2);
-        assertArray(u256.array(), expectedArray);
+        assertArray(u256.slice(), expectedArray);
     }
 
     function testIndexOfAndLastIndexOf() external {
@@ -571,97 +571,151 @@ contract ArrayLibsTest is Test {
         u256.concat(expectedArray);
 
         // iterate through all array and add, sub, mul, div, pow, xor every elem by 3
-        (_add, , , , , , ) = helper(u256.array(), 3, 0, 7);
+        (_add, , , , , , ) = helper(u256.slice(), 3, 0, 7);
         u256.forEach(add, 3);
-        assertArray(u256.array(), _add);
+        assertArray(u256.slice(), _add);
 
-        (, _sub, , , , , ) = helper(u256.array(), 3, 0, 7);
+        (, _sub, , , , , ) = helper(u256.slice(), 3, 0, 7);
         u256.forEach(sub, 3);
-        assertArray(u256.array(), _sub);
+        assertArray(u256.slice(), _sub);
 
-        (, , _mul, , , , ) = helper(u256.array(), 3, 0, 7);
+        (, , _mul, , , , ) = helper(u256.slice(), 3, 0, 7);
         u256.forEach(mul, 3);
-        assertArray(u256.array(), _mul);
+        assertArray(u256.slice(), _mul);
 
-        (, , , _div, , , ) = helper(u256.array(), 3, 0, 7);
+        (, , , _div, , , ) = helper(u256.slice(), 3, 0, 7);
         u256.forEach(div, 3);
-        assertArray(u256.array(), _div);
+        assertArray(u256.slice(), _div);
 
-        (, , , , _mod, , ) = helper(u256.array(), 3, 0, 7);
+        (, , , , _mod, , ) = helper(u256.slice(), 3, 0, 7);
         u256.forEach(mod, 3);
-        assertArray(u256.array(), _mod);
+        assertArray(u256.slice(), _mod);
 
         u256.forEach(add, 11);
 
-        (, , , , , _pow, ) = helper(u256.array(), 3, 0, 7);
+        (, , , , , _pow, ) = helper(u256.slice(), 3, 0, 7);
         u256.forEach(pow, 3);
-        assertArray(u256.array(), _pow);
+        assertArray(u256.slice(), _pow);
 
-        (, , , , , , _xor) = helper(u256.array(), 3, 0, 7);
+        (, , , , , , _xor) = helper(u256.slice(), 3, 0, 7);
         u256.forEach(xor, 3);
-        assertArray(u256.array(), _xor);
+        assertArray(u256.slice(), _xor);
 
         // iterate through array from 4th index to the end and add, sub, mul, div, pow, xor every elem by 5
-        (_add, , , , , , ) = helper(u256.array(4), 5, 0, 3);
+        (_add, , , , , , ) = helper(u256.slice(4), 5, 0, 3);
         u256.forEach(add, 5, 4);
-        assertArray(u256.array(4), _add);
+        assertArray(u256.slice(4), _add);
 
-        (, _sub, , , , , ) = helper(u256.array(4), 5, 0, 3);
+        (, _sub, , , , , ) = helper(u256.slice(4), 5, 0, 3);
         u256.forEach(sub, 5, 4);
-        assertArray(u256.array(4), _sub);
+        assertArray(u256.slice(4), _sub);
 
-        (, , _mul, , , , ) = helper(u256.array(4), 5, 0, 3);
+        (, , _mul, , , , ) = helper(u256.slice(4), 5, 0, 3);
         u256.forEach(mul, 5, 4);
-        assertArray(u256.array(4), _mul);
+        assertArray(u256.slice(4), _mul);
 
-        (, , , _div, , , ) = helper(u256.array(4), 5, 0, 3);
+        (, , , _div, , , ) = helper(u256.slice(4), 5, 0, 3);
         u256.forEach(div, 5, 4);
-        assertArray(u256.array(4), _div);
+        assertArray(u256.slice(4), _div);
 
-        (, , , , _mod, , ) = helper(u256.array(4), 5, 0, 3);
+        (, , , , _mod, , ) = helper(u256.slice(4), 5, 0, 3);
         u256.forEach(mod, 5, 4);
-        assertArray(u256.array(4), _mod);
+        assertArray(u256.slice(4), _mod);
 
         u256.forEach(add, 41);
 
-        (, , , , , _pow, ) = helper(u256.array(4), 5, 0, 3);
+        (, , , , , _pow, ) = helper(u256.slice(4), 5, 0, 3);
         u256.forEach(pow, 5, 4);
-        assertArray(u256.array(4), _pow);
+        assertArray(u256.slice(4), _pow);
 
-        (, , , , , , _xor) = helper(u256.array(4), 5, 0, 3);
+        (, , , , , , _xor) = helper(u256.slice(4), 5, 0, 3);
         u256.forEach(xor, 5, 4);
-        assertArray(u256.array(4), _xor);
+        assertArray(u256.slice(4), _xor);
 
         // iterate through array from 1st index to 4th and add, sub, mul, div, pow, xor every elem by 2
-        (_add, , , , , , ) = helper(u256.array(1, 4), 2, 0, 4);
+        (_add, , , , , , ) = helper(u256.slice(1, 4), 2, 0, 4);
         u256.forEach(add, 2, 1, 4);
-        assertArray(u256.array(1, 4), _add);
+        assertArray(u256.slice(1, 4), _add);
 
-        (, _sub, , , , , ) = helper(u256.array(1, 4), 2, 0, 4);
+        (, _sub, , , , , ) = helper(u256.slice(1, 4), 2, 0, 4);
         u256.forEach(sub, 2, 1, 4);
-        assertArray(u256.array(1, 4), _sub);
+        assertArray(u256.slice(1, 4), _sub);
 
-        (, , _mul, , , , ) = helper(u256.array(1, 4), 2, 0, 4);
+        (, , _mul, , , , ) = helper(u256.slice(1, 4), 2, 0, 4);
         u256.forEach(mul, 2, 1, 4);
-        assertArray(u256.array(1, 4), _mul);
+        assertArray(u256.slice(1, 4), _mul);
 
-        (, , , _div, , , ) = helper(u256.array(1, 4), 2, 0, 4);
+        (, , , _div, , , ) = helper(u256.slice(1, 4), 2, 0, 4);
         u256.forEach(div, 2, 1, 4);
-        assertArray(u256.array(1, 4), _div);
+        assertArray(u256.slice(1, 4), _div);
 
-        (, , , , _mod, , ) = helper(u256.array(1, 4), 2, 0, 4);
+        (, , , , _mod, , ) = helper(u256.slice(1, 4), 2, 0, 4);
         u256.forEach(mod, 2, 1, 4);
-        assertArray(u256.array(1, 4), _mod);
+        assertArray(u256.slice(1, 4), _mod);
 
         u256.forEach(add, 41);
 
-        (, , , , , _pow, ) = helper(u256.array(1, 4), 2, 0, 4);
+        (, , , , , _pow, ) = helper(u256.slice(1, 4), 2, 0, 4);
         u256.forEach(pow, 2, 1, 4);
-        assertArray(u256.array(1, 4), _pow);
+        assertArray(u256.slice(1, 4), _pow);
 
-        (, , , , , , _xor) = helper(u256.array(1, 4), 2, 0, 4);
+        (, , , , , , _xor) = helper(u256.slice(1, 4), 2, 0, 4);
         u256.forEach(xor, 2, 1, 4);
-        assertArray(u256.array(1, 4), _xor);
+        assertArray(u256.slice(1, 4), _xor);
+    }
+
+    function testReverse() external {
+        uint256[] memory expectedArray;
+
+        expectedArray = Solarray.uint256s(
+            type(uint184).max,
+            type(uint192).max,
+            type(uint200).max,
+            type(uint208).max,
+            type(uint216).max,
+            type(uint224).max,
+            type(uint232).max
+        );
+        u256.concat(expectedArray);
+
+        // reverse all array
+        expectedArray = Solarray.uint256s(
+            type(uint232).max,
+            type(uint224).max,
+            type(uint216).max,
+            type(uint208).max,
+            type(uint200).max,
+            type(uint192).max,
+            type(uint184).max
+        );
+        u256.reverse();
+        assertArray(u256.slice(), expectedArray);
+
+        // reverse array from 3rd index to the end
+        expectedArray = Solarray.uint256s(
+            type(uint232).max,
+            type(uint224).max,
+            type(uint216).max,
+            type(uint184).max,
+            type(uint192).max,
+            type(uint200).max,
+            type(uint208).max
+        );
+        u256.reverse(3);
+        assertArray(u256.slice(), expectedArray);
+
+        // reverse array from 0 index to 2nd
+        expectedArray = Solarray.uint256s(
+            type(uint216).max,
+            type(uint224).max,
+            type(uint232).max,
+            type(uint184).max,
+            type(uint192).max,
+            type(uint200).max,
+            type(uint208).max
+        );
+        u256.reverse(0, 2);
+        assertArray(u256.slice(), expectedArray);
     }
 
     function assertArray(
