@@ -16,9 +16,8 @@ pragma solidity ^0.8.0;
     [x] remove
     [x] includes
         - [x] bounds
-    [] fill
+    [x] fill
         - [x] bounds
-        - [] return modified array
     [x] indexOf & lastIndexOf
        - [x] bounds
     [x] filter
@@ -33,9 +32,9 @@ pragma solidity ^0.8.0;
     [x] map
        - [x] add, sub, mul, div, mod, pow, xor
        - [x] bounds
-    [] forEach
+    [x] forEach
        - [x] add, sub, mul, div, mod, pow, xor
-       - [] bounds
+       - [x] bounds
     [] reverse (???)
        - [] (?)
        - [] bounds
@@ -414,16 +413,15 @@ library Uint256Array {
         }
     }
 
-    // TODO return the modified array instead of rewrite state
-    function fill(CustomArray storage _self, uint256 value) internal {
+    function fillState(CustomArray storage _self, uint256 value) internal {
         uint256 indexTo;
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
-        fill(_self, value, 0, indexTo);
+        fillState(_self, value, 0, indexTo);
     }
 
-    function fill(
+    function fillState(
         CustomArray storage _self,
         uint256 value,
         uint256 indexFrom
@@ -432,10 +430,10 @@ library Uint256Array {
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
-        fill(_self, value, indexFrom, indexTo);
+        fillState(_self, value, indexFrom, indexTo);
     }
 
-    function fill(
+    function fillState(
         CustomArray storage _self,
         uint256 value,
         uint256 indexFrom,
@@ -1087,6 +1085,8 @@ library Uint256Array {
 
             slot := add(sload(add(_self.slot, 0x01)), indexFrom)
             indexTo := add(indexTo, 0x01)
+
+            newArray := mload(0x40)
             mstore(newArray, sub(indexTo, indexFrom))
         }
 
