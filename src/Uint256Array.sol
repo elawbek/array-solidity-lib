@@ -14,34 +14,24 @@ pragma solidity ^0.8.0;
     [x] update
     [x] remove
     [x] includes
-        - [x] bounds
     [x] fill
-        - [x] bounds
     [x] indexOf & lastIndexOf
-       - [x] bounds
     [x] filter
        - [x] lt, gt, eq, lte, gte
-       - [x] bounds
     [x] find & findLast
        - [x] lt, gt, eq, lte, gte
-       - [x] bounds
     [x] findIndex & findLastIndex
        - [x] lt, gt, eq, lte, gte
-       - [x] bounds
     [x] map
        - [x] add, sub, mul, div, mod, pow, xor
-       - [x] bounds
     [x] forEach
        - [x] add, sub, mul, div, mod, pow, xor
-       - [x] bounds
     [x] reverse
-       - [x] bounds
-    [] some(?)
-       - [] callbacks
-       - [] bounds
-    [] sort(???)
+    [x] some
+       - [x] lt, gt, eq, lte, gte
     [] every
-       - [] bounds
+       - [x] lt, gt, eq, lte, gte
+    [] sort(???)
  */
 
 library Uint256Array {
@@ -1243,6 +1233,81 @@ library Uint256Array {
                 value := sload(slotIndexFrom)
                 sstore(slotIndexFrom, sload(slotIndexTo))
                 sstore(slotIndexTo, value)
+            }
+        }
+    }
+
+    function some(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue
+    ) internal view returns (bool exists) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        exists = some(_self, callback, comparativeValue, 0, indexTo);
+    }
+
+    function some(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom
+    ) internal view returns (bool exists) {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        exists = some(_self, callback, comparativeValue, indexFrom, indexTo);
+    }
+
+    function some(
+        CustomArray storage _self,
+        function(uint256, uint256) pure returns (bool) callback,
+        uint256 comparativeValue,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal view returns (bool exists) {
+        bytes32 slot;
+        assembly {
+            let len := sload(_self.slot)
+
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
+                revert(0x1c, 0x04)
+            }
+
+            // TODO rewrite to switch
+            if iszero(lt(indexTo, len)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+
+            slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+            indexTo := add(indexTo, 0x01)
+        }
+
+        uint256 value;
+        for (; indexFrom < indexTo; ) {
+            assembly {
+                value := sload(slot)
+            }
+
+            if (callback(value, comparativeValue)) {
+                assembly {
+                    exists := 0x01
+                }
+                break;
+            }
+
+            assembly {
+                indexFrom := add(indexFrom, 0x01)
+                slot := add(slot, 0x01)
             }
         }
     }

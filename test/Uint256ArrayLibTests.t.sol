@@ -718,6 +718,36 @@ contract Uint256ArrayLibTests is Test {
         assertArray(u256.slice(), expectedArray);
     }
 
+    function testSome() external {
+        uint256[] memory expectedArray;
+
+        expectedArray = Solarray.uint256s(
+            type(uint240).max,
+            type(uint248).max,
+            type(uint256).max,
+            type(uint8).max,
+            type(uint16).max,
+            type(uint24).max,
+            type(uint32).max
+        );
+        u256.concat(expectedArray);
+
+        // iterate through all array and find elem lt type(uint8).max
+        assertFalse(u256.some(lt, type(uint8).max));
+        // iterate through all array and find elem lte type(uint8).max
+        assertTrue(u256.some(lte, type(uint8).max));
+
+        // iterate through array from 4th index to the end and find elem eq type(uint24).max + 1
+        assertFalse(u256.some(eq, uint256(type(uint24).max) + 1, 4));
+        // iterate through array from 4th index to the end and find elem eq type(uint24).max
+        assertTrue(u256.some(eq, type(uint24).max, 4));
+
+        // iterate through array from 3rd index to 5th and find elem gt type(uint24).max
+        assertFalse(u256.some(gt, type(uint24).max, 3, 5));
+        // iterate through array from 3rd index to 5th and find elem gte type(uint24).max
+        assertTrue(u256.some(gte, type(uint24).max, 3, 5));
+    }
+
     function assertArray(
         uint256[] memory arr,
         uint256[] memory expectedArray
