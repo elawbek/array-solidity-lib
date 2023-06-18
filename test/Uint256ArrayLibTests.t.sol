@@ -778,6 +778,27 @@ contract Uint256ArrayLibTests is Test {
         assertTrue(u256.every(gte, type(uint64).max, 3, 5));
     }
 
+    function testSort() external {
+        uint256[] memory expectedArray;
+
+        expectedArray = Solarray.uint256s(
+            type(uint96).max,
+            type(uint112).max,
+            type(uint104).max,
+            type(uint160).max,
+            type(uint168).max,
+            type(uint240).max,
+            type(uint8).max
+        );
+        u256.concat(expectedArray);
+
+        logArray(u256.slice());
+        u256.sort();
+        logArray(u256.slice());
+        u256.reverse();
+        logArray(u256.slice());
+    }
+
     function assertArray(
         uint256[] memory arr,
         uint256[] memory expectedArray

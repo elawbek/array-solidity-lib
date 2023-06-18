@@ -1388,6 +1388,96 @@ library Uint256Array {
             }
         }
     }
+
+    function sort(CustomArray storage _self) internal {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        sort(_self, 0, indexTo);
+    }
+
+    function sort(CustomArray storage _self, uint256 indexFrom) internal {
+        uint256 indexTo;
+        assembly {
+            indexTo := sub(sload(_self.slot), 0x01)
+        }
+
+        sort(_self, indexFrom, indexTo);
+    }
+
+    function sort(
+        CustomArray storage _self,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal {
+        assembly {
+            let len := sload(_self.slot)
+
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
+                revert(0x1c, 0x04)
+            }
+
+            // TODO rewrite to switch
+            if iszero(lt(indexTo, len)) {
+                // IndexDoesNotExist()
+                mstore(0x00, 0x2238ba58)
+                revert(0x1c, 0x04)
+            }
+        }
+        bubbleSort(_self, indexFrom, indexTo);
+    }
+
+    function bubbleSort(
+        CustomArray storage _self,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) internal {
+        assembly {
+            for {
+                indexTo := add(indexTo, 0x01)
+                let len := sub(indexTo, indexFrom)
+
+                let swapped
+                let slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+            } len {
+                swapped := 0x00
+            } {
+                len := sub(len, 0x01)
+
+                for {
+                    let i
+                    let nextSlot
+                    let currentSlot := slot
+                    let currentValue := sload(slot)
+                    let nextValue
+                } lt(i, len) {
+                    i := add(i, 0x01)
+                    currentSlot := nextSlot
+                } {
+                    nextSlot := add(currentSlot, 0x01)
+                    nextValue := sload(nextSlot)
+
+                    switch gt(currentValue, nextValue)
+                    case 0x01 {
+                        sstore(currentSlot, nextValue)
+                        sstore(nextSlot, currentValue)
+                        swapped := 0x01
+                    }
+                    default {
+                        currentValue := nextValue
+                    }
+                }
+
+                if iszero(swapped) {
+                    break
+                }
+            }
+        }
+    }
 }
 
 // TODO helper
