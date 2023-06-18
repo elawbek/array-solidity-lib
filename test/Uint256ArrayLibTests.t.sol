@@ -792,11 +792,48 @@ contract Uint256ArrayLibTests is Test {
         );
         u256.concat(expectedArray);
 
-        logArray(u256.slice());
+        // sort the entire array
+        expectedArray = Solarray.uint256s(
+            type(uint8).max,
+            type(uint96).max,
+            type(uint104).max,
+            type(uint112).max,
+            type(uint160).max,
+            type(uint168).max,
+            type(uint240).max
+        );
         u256.sort();
-        logArray(u256.slice());
+        assertArray(u256.slice(), expectedArray);
+
         u256.reverse();
-        logArray(u256.slice());
+
+        // sort array from 3rd index to the end
+        expectedArray = Solarray.uint256s(
+            type(uint240).max,
+            type(uint168).max,
+            type(uint160).max,
+            type(uint8).max,
+            type(uint96).max,
+            type(uint104).max,
+            type(uint112).max
+        );
+        u256.sort(3);
+        assertArray(u256.slice(), expectedArray);
+
+        u256.reverse();
+
+        // sort array from 2nd index to 5th
+        expectedArray = Solarray.uint256s(
+            type(uint112).max,
+            type(uint104).max,
+            type(uint8).max,
+            type(uint96).max,
+            type(uint160).max,
+            type(uint168).max,
+            type(uint240).max
+        );
+        u256.sort(2, 5);
+        assertArray(u256.slice(), expectedArray);
     }
 
     function assertArray(
