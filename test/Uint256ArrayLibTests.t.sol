@@ -58,7 +58,6 @@ contract Uint256ArrayLibTests is Test {
             type(uint16).max,
             type(uint8).max
         );
-
         index = -1;
         for (uint256 i; i < arr.length; ++i) {
             arr[i] = u256.at(index);
@@ -68,7 +67,7 @@ contract Uint256ArrayLibTests is Test {
         assertArray(arr, expectedArray);
     }
 
-    function testArray() external {
+    function testSlice() external {
         uint256[] memory expectedArray;
 
         // Empty array
@@ -280,7 +279,7 @@ contract Uint256ArrayLibTests is Test {
         );
         u256.concat(expectedArray);
 
-        // includes in all array
+        // includes in the entire array
         assertTrue(u256.includes(type(uint248).max));
         assertTrue(u256.includes(type(uint256).max));
         assertTrue(u256.includes(type(uint8).max));
@@ -313,7 +312,7 @@ contract Uint256ArrayLibTests is Test {
         );
         u256.concat(expectedArray);
 
-        // fill all array by 2
+        // fill the entire array by 2
         expectedArray = Solarray.uint256s(2, 2, 2, 2);
         u256.fillState(2);
         assertArray(u256.slice(), expectedArray);
@@ -340,7 +339,7 @@ contract Uint256ArrayLibTests is Test {
         );
         u256.concat(expectedArray);
 
-        // find index in all array
+        // find index in the entire array
         assertEq(u256.indexOf(type(uint56).max), 0);
         assertEq(u256.indexOf(type(uint64).max), 1);
         assertEq(u256.lastIndexOf(type(uint56).max), 3);
@@ -362,6 +361,8 @@ contract Uint256ArrayLibTests is Test {
     function testFilter() external {
         uint256[] memory expectedArray;
 
+        logArray(u256.filter(gt, 1));
+
         expectedArray = Solarray.uint256s(
             type(uint72).max,
             type(uint80).max,
@@ -372,7 +373,7 @@ contract Uint256ArrayLibTests is Test {
         );
         u256.concat(expectedArray);
 
-        // filter lt uint104 in all array
+        // filter lt uint104 in the entire array
         expectedArray = Solarray.uint256s(
             type(uint72).max,
             type(uint80).max,
@@ -389,7 +390,7 @@ contract Uint256ArrayLibTests is Test {
         expectedArray = Solarray.uint256s(type(uint88).max, type(uint96).max);
         assertArray(u256.filter(lt, type(uint104).max, 2, 4), expectedArray);
 
-        // filter gt uint88 in all array
+        // filter gt uint88 in the entire array
         expectedArray = Solarray.uint256s(
             type(uint96).max,
             type(uint104).max,
@@ -411,6 +412,9 @@ contract Uint256ArrayLibTests is Test {
     function testFindAndFindLast() external {
         uint256[] memory expectedArray;
 
+        logArray(u256.find(gt, 1));
+        logArray(u256.findLast(gt, 1));
+
         expectedArray = Solarray.uint256s(
             type(uint120).max,
             type(uint128).max,
@@ -423,7 +427,7 @@ contract Uint256ArrayLibTests is Test {
         u256.concat(expectedArray);
 
         expectedArray = Solarray.uint256s(type(uint136).max);
-        // find elem eq uint136 in all array
+        // find elem eq uint136 in the entire array
         assertArray(u256.find(eq, type(uint136).max), expectedArray);
         assertArray(u256.findLast(eq, type(uint136).max), expectedArray);
 
@@ -453,7 +457,7 @@ contract Uint256ArrayLibTests is Test {
         );
         u256.concat(expectedArray);
 
-        // find elem gte uint160 in all array
+        // find elem gte uint160 in the entire array
         assertEq(u256.findIndex(gte, type(uint160).max), 1);
         assertEq(u256.findLastIndex(gte, type(uint160).max), 5);
 
@@ -465,7 +469,7 @@ contract Uint256ArrayLibTests is Test {
         assertEq(u256.findIndex(gte, type(uint160).max, 5, 6), 5);
         assertEq(u256.findLastIndex(gte, type(uint160).max, 5, 6), 5);
 
-        // // find elem lte uint176 in all array
+        // // find elem lte uint176 in the entire array
         assertEq(u256.findIndex(lte, type(uint176).max), 0);
         assertEq(u256.findLastIndex(lte, type(uint176).max), 6);
 
@@ -488,7 +492,7 @@ contract Uint256ArrayLibTests is Test {
         expectedArray = Solarray.uint256s(11, 22, 33, 44, 55, 66, 77);
         u256.concat(expectedArray);
 
-        // map through all array and add, sub, mul, div, pow, xor every elem by 5
+        // map through the entire array and add, sub, mul, div, pow, xor every elem by 5
         (
             uint256[] memory _add,
             uint256[] memory _sub,
@@ -570,7 +574,7 @@ contract Uint256ArrayLibTests is Test {
         expectedArray = Solarray.uint256s(11, 22, 33, 44, 55, 66, 77);
         u256.concat(expectedArray);
 
-        // iterate through all array and add, sub, mul, div, pow, xor every elem by 3
+        // iterate through the entire array and add, sub, mul, div, pow, xor every elem by 3
         (_add, , , , , , ) = helper(u256.slice(), 3, 0, 7);
         u256.forEach(add, 3);
         assertArray(u256.slice(), _add);
@@ -678,7 +682,7 @@ contract Uint256ArrayLibTests is Test {
         );
         u256.concat(expectedArray);
 
-        // reverse all array
+        // reverse the entire array
         expectedArray = Solarray.uint256s(
             type(uint232).max,
             type(uint224).max,
@@ -732,9 +736,9 @@ contract Uint256ArrayLibTests is Test {
         );
         u256.concat(expectedArray);
 
-        // iterate through all array and find elem lt type(uint8).max
+        // iterate through the entire array and find elem lt type(uint8).max
         assertFalse(u256.some(lt, type(uint8).max));
-        // iterate through all array and find elem lte type(uint8).max
+        // iterate through the entire array and find elem lte type(uint8).max
         assertTrue(u256.some(lte, type(uint8).max));
 
         // iterate through array from 4th index to the end and find elem eq type(uint24).max + 1
@@ -762,9 +766,9 @@ contract Uint256ArrayLibTests is Test {
         );
         u256.concat(expectedArray);
 
-        // iterate through all array and check that all elems lt type(uint64).max
+        // iterate through the entire array and check that all elems lt type(uint64).max
         assertFalse(u256.every(lt, type(uint64).max));
-        // iterate through all array and check that all elems lte type(uint96).max
+        // iterate through the entire array and check that all elems lte type(uint96).max
         assertTrue(u256.every(lte, type(uint96).max));
 
         // iterate through array from 4th index to the end and check that all elems eq type(uint56).max
