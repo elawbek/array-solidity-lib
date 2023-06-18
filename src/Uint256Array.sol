@@ -31,9 +31,9 @@ pragma solidity ^0.8.0;
        - [x] lt, gt, eq, lte, gte
     [x] every
        - [x] lt, gt, eq, lte, gte
-    [] sort
+    [x] sort
        - [x] bubbleSort
-       - [] quickSort (???)
+       - [x] quickSort
  */
 
 library Uint256Array {
@@ -1404,7 +1404,7 @@ library Uint256Array {
                 revert(0x1c, 0x04)
             }
         }
-        bubbleSort(_self, indexFrom, indexTo);
+        quickSort(_self, indexFrom, indexTo);
     }
 
     function bubbleSort(
@@ -1451,6 +1451,85 @@ library Uint256Array {
                 if iszero(swapped) {
                     break
                 }
+            }
+        }
+    }
+
+    function quickSort(
+        CustomArray storage _self,
+        uint256 indexFrom,
+        uint256 indexTo
+    ) private {
+        assembly {
+            for {
+                mstore(0x20, sload(add(_self.slot, 0x01)))
+                let stack := mload(0x40)
+                mstore(stack, indexFrom)
+                mstore(add(stack, 0x20), indexTo)
+                stack := add(stack, 0x40)
+                let stackLen := 0x1
+
+                let low
+                let high
+                let pivot
+            } stackLen {
+
+            } {
+                stack := sub(stack, 0x40)
+                low := mload(stack)
+                high := mload(add(stack, 0x20))
+                stackLen := sub(stackLen, 0x01)
+
+                pivot := partition(low, high)
+
+                if pivot {
+                    if gt(sub(pivot, 0x01), low) {
+                        mstore(stack, low)
+                        mstore(add(stack, 0x20), sub(pivot, 0x01))
+                        stack := add(stack, 0x40)
+                        stackLen := add(stackLen, 0x01)
+                    }
+                }
+
+                if lt(add(pivot, 0x01), high) {
+                    mstore(stack, add(pivot, 0x01))
+                    mstore(add(stack, 0x20), high)
+                    stack := add(stack, 0x40)
+                    stackLen := add(stackLen, 0x01)
+                }
+            }
+
+            function partition(low, high) -> index {
+                let slot := mload(0x20)
+
+                let pivot := sload(add(slot, high))
+                let i := sub(low, 0x01)
+                let slotI
+                let value
+
+                for {
+                    let j := low
+                    let slotJ
+                } lt(j, high) {
+                    j := add(j, 0x01)
+                } {
+                    slotJ := add(slot, j)
+                    value := sload(slotJ)
+
+                    if iszero(gt(value, pivot)) {
+                        i := add(i, 0x01)
+                        slotI := add(slot, i)
+                        sstore(slotJ, sload(slotI))
+                        sstore(slotI, value)
+                    }
+                }
+
+                slotI := add(slot, add(i, 0x01))
+                value := sload(slotI)
+                sstore(slotI, sload(add(slot, high)))
+                sstore(add(slot, high), value)
+
+                index := add(i, 0x01)
             }
         }
     }
