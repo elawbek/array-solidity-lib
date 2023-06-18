@@ -748,6 +748,36 @@ contract Uint256ArrayLibTests is Test {
         assertTrue(u256.some(gte, type(uint24).max, 3, 5));
     }
 
+    function testEvery() external {
+        uint256[] memory expectedArray;
+
+        expectedArray = Solarray.uint256s(
+            type(uint40).max,
+            type(uint48).max,
+            type(uint56).max,
+            type(uint64).max,
+            type(uint72).max,
+            type(uint80).max,
+            type(uint88).max
+        );
+        u256.concat(expectedArray);
+
+        // iterate through all array and check that all elems lt type(uint64).max
+        assertFalse(u256.every(lt, type(uint64).max));
+        // iterate through all array and check that all elems lte type(uint96).max
+        assertTrue(u256.every(lte, type(uint96).max));
+
+        // iterate through array from 4th index to the end and check that all elems eq type(uint56).max
+        assertFalse(u256.every(eq, uint256(type(uint56).max), 4));
+        // iterate through array from 6th index to the end and find elem eq type(uint88).max
+        assertTrue(u256.every(eq, type(uint88).max, 6));
+
+        // iterate through array from 3rd index to 5th and check that all elems gt type(uint72).max
+        assertFalse(u256.every(gt, type(uint72).max, 3, 5));
+        // iterate through array from 3rd index to 5th and check that all elems gte type(uint64).max
+        assertTrue(u256.every(gte, type(uint64).max, 3, 5));
+    }
+
     function assertArray(
         uint256[] memory arr,
         uint256[] memory expectedArray
