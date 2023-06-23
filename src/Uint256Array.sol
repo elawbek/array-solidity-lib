@@ -33,16 +33,25 @@ pragma solidity ^0.8.0;
        - [x] lt, gt, eq, lte, gte
  */
 
+/**
+ * @dev Collection of functions related to the custom uint256 array type
+ */
 library Uint256Array {
     error IndexDoesNotExist();
     error ArrayIsEmpty();
     error WrongArguments();
 
+    /**
+     * @dev CustomArray type, which contains the len and slot of the first element.
+     */
     struct CustomArray {
         uint256 len;
         uint256 slot;
     }
 
+    /**
+     * @dev Returns the length of the array.
+     */
     function length(
         CustomArray storage _self
     ) internal view returns (uint256 len) {
@@ -52,6 +61,14 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Takes an integer value and returns the item at that `index`.
+     * Allowing for positive and negative integers. Negative integers
+     * count back from the last item in the array.
+     *
+     *  Requirements:
+     * - the `index` value must be in the range [-len; len-1].
+     */
     function at(
         CustomArray storage _self,
         int256 index
@@ -73,6 +90,13 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Returns a copy of an array start to end where start
+     * and end represent the index of items in that array.
+     * The original array will not be modified.
+     *
+     * Returns an empty array if it has no elements.
+     */
     function slice(
         CustomArray storage _self
     ) internal view returns (uint256[] memory arr) {
@@ -85,6 +109,17 @@ library Uint256Array {
         arr = slice(_self, 0, indexTo);
     }
 
+    /**
+     * @dev Returns a copy of an array from `indexFrom` to end
+     * where `indexFrom` and end represent the index of items in that array
+     * and `indexFrom` is the argument of the function.
+     * The original array will not be modified.
+     *
+     *  Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * Returns an empty array if it has no elements. NOTE: `indexFrom` must be equal 0.
+     */
     function slice(
         CustomArray storage _self,
         uint256 indexFrom
@@ -98,6 +133,22 @@ library Uint256Array {
         arr = slice(_self, indexFrom, indexTo);
     }
 
+    /**
+     * @dev Returns a copy of an array from `indexFrom` to `indexTo`
+     * where `indexFrom` and `indexTo` represent the index of items in that array
+     * and are arguments of the function .
+     * The original array will not be modified.
+     *
+     *  Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * Returns an empty array if it has no elements.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error, the result will be an empty array).
+     */
     function slice(
         CustomArray storage _self,
         uint256 indexFrom,
@@ -141,6 +192,11 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Adds the specified element to the end of an array.
+     *
+     * [1, 2, 3] -> push(4) -> [1, 2, 3, 4]
+     */
     function push(CustomArray storage _self, uint256 value) internal {
         /// @solidity memory-safe-assembly
         assembly {
@@ -151,6 +207,11 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Adds two specified elements to the end of the array.
+     *
+     * [1, 2, 3] -> push(4, 5) -> [1, 2, 3, 4, 5]
+     */
     function push(
         CustomArray storage _self,
         uint256 value1,
@@ -168,6 +229,11 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Adds three specified elements to the end of the array.
+     *
+     * [1, 2, 3] -> push(4, 5, 6) -> [1, 2, 3, 4, 5, 6]
+     */
     function push(
         CustomArray storage _self,
         uint256 value1,
@@ -187,6 +253,11 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Adds the specified element to the beginning of an array.
+     *
+     * [1, 2, 3] -> unshift(4) -> [4, 1, 2, 3]
+     */
     function unshift(CustomArray storage _self, uint256 value) internal {
         /// @solidity memory-safe-assembly
         assembly {
@@ -199,6 +270,11 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Adds two specified elements to the beginning of an array.
+     *
+     * [1, 2, 3] -> unshift(4, 5) -> [4, 5, 1, 2, 3]
+     */
     function unshift(
         CustomArray storage _self,
         uint256 value1,
@@ -216,6 +292,11 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Adds three specified elements to the beginning of an array.
+     *
+     * [1, 2, 3] -> unshift(4, 5, 6) -> [4, 5, 6, 1, 2, 3]
+     */
     function unshift(
         CustomArray storage _self,
         uint256 value1,
@@ -235,6 +316,11 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Adds all values of the passed array to the end of the array..
+     *
+     * [1, 2, 3] -> concat([4, 5, 6]) -> [4, 5, 6, 1, 2, 3]
+     */
     function concat(
         CustomArray storage _self,
         uint256[] memory values
@@ -260,6 +346,10 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Removes the last element from an array and returns that element.
+     * This method changes the length of the array.
+     */
     function pop(CustomArray storage _self) internal returns (uint256 elem) {
         /// @solidity memory-safe-assembly
         assembly {
