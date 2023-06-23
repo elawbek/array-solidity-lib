@@ -782,64 +782,6 @@ contract Uint256ArrayLibTests is Test {
         assertTrue(u256.every(gte, type(uint64).max, 3, 5));
     }
 
-    function testSort() external {
-        uint256[] memory expectedArray;
-
-        expectedArray = Solarray.uint256s(
-            type(uint96).max,
-            type(uint112).max,
-            type(uint104).max,
-            type(uint160).max,
-            type(uint168).max,
-            type(uint240).max,
-            type(uint8).max
-        );
-        u256.concat(expectedArray);
-
-        // sort the entire array
-        expectedArray = Solarray.uint256s(
-            type(uint8).max,
-            type(uint96).max,
-            type(uint104).max,
-            type(uint112).max,
-            type(uint160).max,
-            type(uint168).max,
-            type(uint240).max
-        );
-        u256.sort();
-        assertArray(u256.slice(), expectedArray);
-
-        u256.reverse();
-
-        // sort array from 3rd index to the end
-        expectedArray = Solarray.uint256s(
-            type(uint240).max,
-            type(uint168).max,
-            type(uint160).max,
-            type(uint8).max,
-            type(uint96).max,
-            type(uint104).max,
-            type(uint112).max
-        );
-        u256.sort(3);
-        assertArray(u256.slice(), expectedArray);
-
-        u256.reverse();
-
-        // sort array from 2nd index to 5th
-        expectedArray = Solarray.uint256s(
-            type(uint112).max,
-            type(uint104).max,
-            type(uint8).max,
-            type(uint96).max,
-            type(uint160).max,
-            type(uint168).max,
-            type(uint240).max
-        );
-        u256.sort(2, 5);
-        assertArray(u256.slice(), expectedArray);
-    }
-
     function assertArray(
         uint256[] memory arr,
         uint256[] memory expectedArray

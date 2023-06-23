@@ -31,9 +31,6 @@ pragma solidity ^0.8.0;
        - [x] lt, gt, eq, lte, gte
     [x] every
        - [x] lt, gt, eq, lte, gte
-    [x] sort
-       - [x] bubbleSort
-       - [x] quickSort
  */
 
 library Uint256Array {
@@ -49,6 +46,7 @@ library Uint256Array {
     function length(
         CustomArray storage _self
     ) internal view returns (uint256 len) {
+        /// @solidity memory-safe-assembly
         assembly {
             len := sload(_self.slot)
         }
@@ -58,6 +56,7 @@ library Uint256Array {
         CustomArray storage _self,
         int256 index
     ) internal view returns (uint256 result) {
+        /// @solidity memory-safe-assembly
         assembly {
             let len := sload(_self.slot)
             if shr(0xff, index) {
@@ -78,6 +77,8 @@ library Uint256Array {
         CustomArray storage _self
     ) internal view returns (uint256[] memory arr) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -89,6 +90,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (uint256[] memory arr) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -100,6 +103,7 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal view returns (uint256[] memory arr) {
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -132,12 +136,13 @@ library Uint256Array {
                     mstore(offset, sload(slot))
                 }
 
-                mstore(0x40, add(offset, 0x20))
+                mstore(0x40, offset)
             }
         }
     }
 
     function push(CustomArray storage _self, uint256 value) internal {
+        /// @solidity memory-safe-assembly
         assembly {
             let len := sload(_self.slot)
 
@@ -151,6 +156,7 @@ library Uint256Array {
         uint256 value1,
         uint256 value2
     ) internal {
+        /// @solidity memory-safe-assembly
         assembly {
             let len := sload(_self.slot)
             let slot := add(sload(add(_self.slot, 0x01)), len)
@@ -168,6 +174,7 @@ library Uint256Array {
         uint256 value2,
         uint256 value3
     ) internal {
+        /// @solidity memory-safe-assembly
         assembly {
             let len := sload(_self.slot)
             let slot := add(sload(add(_self.slot, 0x01)), len)
@@ -181,6 +188,7 @@ library Uint256Array {
     }
 
     function unshift(CustomArray storage _self, uint256 value) internal {
+        /// @solidity memory-safe-assembly
         assembly {
             let slot := sub(sload(add(_self.slot, 0x01)), 0x01)
 
@@ -196,6 +204,7 @@ library Uint256Array {
         uint256 value1,
         uint256 value2
     ) internal {
+        /// @solidity memory-safe-assembly
         assembly {
             let slot := sub(sload(add(_self.slot, 0x01)), 0x02)
 
@@ -213,6 +222,7 @@ library Uint256Array {
         uint256 value2,
         uint256 value3
     ) internal {
+        /// @solidity memory-safe-assembly
         assembly {
             let slot := sub(sload(add(_self.slot, 0x01)), 0x03)
 
@@ -229,6 +239,7 @@ library Uint256Array {
         CustomArray storage _self,
         uint256[] memory values
     ) internal {
+        /// @solidity memory-safe-assembly
         assembly {
             let len := sload(_self.slot)
             let lenArray := mload(values)
@@ -250,6 +261,7 @@ library Uint256Array {
     }
 
     function pop(CustomArray storage _self) internal returns (uint256 elem) {
+        /// @solidity memory-safe-assembly
         assembly {
             let len := sload(_self.slot)
 
@@ -269,6 +281,7 @@ library Uint256Array {
     }
 
     function shift(CustomArray storage _self) internal returns (uint256 elem) {
+        /// @solidity memory-safe-assembly
         assembly {
             let len := sload(_self.slot)
 
@@ -293,6 +306,7 @@ library Uint256Array {
         int256 index,
         uint256 value
     ) internal {
+        /// @solidity memory-safe-assembly
         assembly {
             let len := sload(_self.slot)
             if shr(0xff, index) {
@@ -310,8 +324,15 @@ library Uint256Array {
     }
 
     function remove(CustomArray storage _self, int256 index) internal {
+        /// @solidity memory-safe-assembly
         assembly {
             let len := sload(_self.slot)
+
+            if iszero(len) {
+                // ArrayIsEmpty()
+                mstore(0x00, 0x5585048a)
+                revert(0x1c, 0x04)
+            }
 
             if shr(0xff, index) {
                 index := sub(len, add(not(index), 0x01))
@@ -325,10 +346,13 @@ library Uint256Array {
 
             let slot := sload(add(_self.slot, 0x01))
 
-            sstore(add(slot, index), sload(sub(add(slot, len), 0x01)))
-        }
+            len := sub(len, 0x01)
+            sstore(add(slot, index), sload(add(slot, len)))
 
-        pop(_self);
+            slot := add(slot, len)
+            sstore(slot, 0x00)
+            sstore(_self.slot, len)
+        }
     }
 
     function includes(
@@ -336,6 +360,8 @@ library Uint256Array {
         uint256 value
     ) internal view returns (bool result) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -348,6 +374,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (bool result) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -360,6 +388,7 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal view returns (bool result) {
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -369,21 +398,23 @@ library Uint256Array {
 
             let len := sload(_self.slot)
 
-            if iszero(lt(indexTo, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
-            }
+            if len {
+                if iszero(lt(indexTo, len)) {
+                    // IndexDoesNotExist()
+                    mstore(0x00, 0x2238ba58)
+                    revert(0x1c, 0x04)
+                }
 
-            for {
-                let slot := add(sload(add(_self.slot, 0x01)), indexFrom)
-            } iszero(gt(indexFrom, indexTo)) {
-                indexFrom := add(indexFrom, 0x01)
-                slot := add(slot, 0x01)
-            } {
-                if eq(sload(slot), value) {
-                    result := 0x01
-                    break
+                for {
+                    let slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+                } iszero(gt(indexFrom, indexTo)) {
+                    indexFrom := add(indexFrom, 0x01)
+                    slot := add(slot, 0x01)
+                } {
+                    if eq(sload(slot), value) {
+                        result := 0x01
+                        break
+                    }
                 }
             }
         }
@@ -391,6 +422,8 @@ library Uint256Array {
 
     function fillState(CustomArray storage _self, uint256 value) internal {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -403,6 +436,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -415,6 +450,7 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal {
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -423,6 +459,12 @@ library Uint256Array {
             }
 
             let len := sload(_self.slot)
+
+            if iszero(len) {
+                // ArrayIsEmpty()
+                mstore(0x00, 0x5585048a)
+                revert(0x1c, 0x04)
+            }
 
             if iszero(lt(indexTo, len)) {
                 // IndexDoesNotExist()
@@ -446,6 +488,8 @@ library Uint256Array {
         uint256 value
     ) internal view returns (int256 index) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -459,6 +503,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (int256 index) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -472,6 +518,7 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal view returns (int256 index) {
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -480,23 +527,25 @@ library Uint256Array {
             }
 
             let len := sload(_self.slot)
+            index := not(0x00)
 
-            if iszero(lt(indexTo, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
-            }
+            if len {
+                if iszero(lt(indexTo, len)) {
+                    // IndexDoesNotExist()
+                    mstore(0x00, 0x2238ba58)
+                    revert(0x1c, 0x04)
+                }
 
-            for {
-                index := not(0x00)
-                let slot := add(sload(add(_self.slot, 0x01)), indexFrom)
-            } iszero(gt(indexFrom, indexTo)) {
-                indexFrom := add(indexFrom, 0x01)
-                slot := add(slot, 0x01)
-            } {
-                if eq(sload(slot), value) {
-                    index := indexFrom
-                    break
+                for {
+                    let slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+                } iszero(gt(indexFrom, indexTo)) {
+                    indexFrom := add(indexFrom, 0x01)
+                    slot := add(slot, 0x01)
+                } {
+                    if eq(sload(slot), value) {
+                        index := indexFrom
+                        break
+                    }
                 }
             }
         }
@@ -507,6 +556,8 @@ library Uint256Array {
         uint256 value
     ) internal view returns (int256 index) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -520,6 +571,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (int256 index) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -533,6 +586,7 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal view returns (int256 index) {
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -541,25 +595,27 @@ library Uint256Array {
             }
 
             let len := sload(_self.slot)
+            index := not(0x00)
 
-            if iszero(lt(indexTo, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
-            }
+            if len {
+                if iszero(lt(indexTo, len)) {
+                    // IndexDoesNotExist()
+                    mstore(0x00, 0x2238ba58)
+                    revert(0x1c, 0x04)
+                }
 
-            for {
-                let cashedIndexTo := indexTo
-                index := not(0x00)
-                let slot := add(sload(add(_self.slot, 0x01)), indexTo)
-            } iszero(gt(indexFrom, cashedIndexTo)) {
-                indexFrom := add(indexFrom, 0x01)
-                indexTo := sub(indexTo, 0x01)
-                slot := sub(slot, 0x01)
-            } {
-                if eq(sload(slot), value) {
-                    index := indexTo
-                    break
+                for {
+                    let cashedIndexTo := indexTo
+                    let slot := add(sload(add(_self.slot, 0x01)), indexTo)
+                } iszero(gt(indexFrom, cashedIndexTo)) {
+                    indexFrom := add(indexFrom, 0x01)
+                    indexTo := sub(indexTo, 0x01)
+                    slot := sub(slot, 0x01)
+                } {
+                    if eq(sload(slot), value) {
+                        index := indexTo
+                        break
+                    }
                 }
             }
         }
@@ -571,6 +627,8 @@ library Uint256Array {
         uint256 comparativeValue
     ) internal view returns (uint256[] memory filteredArray) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -585,6 +643,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (uint256[] memory filteredArray) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -607,6 +667,8 @@ library Uint256Array {
     ) internal view returns (uint256[] memory filteredArray) {
         uint256 len;
         bytes32 slot;
+
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -635,6 +697,7 @@ library Uint256Array {
 
             uint256 value;
             for (; indexFrom < indexTo; ) {
+                /// @solidity memory-safe-assembly
                 assembly {
                     value := sload(slot)
                     indexFrom := add(indexFrom, 0x01)
@@ -643,12 +706,15 @@ library Uint256Array {
 
                 if (callback(value, comparativeValue)) {
                     filteredArray[counter] = value;
+
+                    /// @solidity memory-safe-assembly
                     assembly {
                         counter := add(counter, 0x01)
                     }
                 }
             }
 
+            /// @solidity memory-safe-assembly
             assembly {
                 mstore(filteredArray, counter)
             }
@@ -661,6 +727,8 @@ library Uint256Array {
         uint256 comparativeValue
     ) internal view returns (uint256[] memory findedValue) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -675,6 +743,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (uint256[] memory findedValue) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -697,6 +767,8 @@ library Uint256Array {
     ) internal view returns (uint256[] memory findedValue) {
         uint256 len;
         bytes32 slot;
+
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -723,6 +795,7 @@ library Uint256Array {
             bool success;
             uint256 value;
             for (; indexFrom < indexTo; ) {
+                /// @solidity memory-safe-assembly
                 assembly {
                     value := sload(slot)
                     indexFrom := add(indexFrom, 0x01)
@@ -730,12 +803,15 @@ library Uint256Array {
                 }
 
                 if (callback(value, comparativeValue)) {
-                    findedValue[0] = value;
-                    success = true;
+                    assembly {
+                        mstore(add(findedValue, 0x20), value)
+                        success := 0x01
+                    }
                     break;
                 }
             }
 
+            /// @solidity memory-safe-assembly
             assembly {
                 if iszero(success) {
                     mstore(findedValue, 0x00)
@@ -750,6 +826,8 @@ library Uint256Array {
         uint256 comparativeValue
     ) internal view returns (uint256[] memory findedValue) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -764,6 +842,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (uint256[] memory findedValue) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -786,6 +866,8 @@ library Uint256Array {
     ) internal view returns (uint256[] memory findedValue) {
         uint256 len;
         bytes32 slot;
+
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -813,6 +895,7 @@ library Uint256Array {
             uint256 value;
 
             for (; indexFrom < indexTo; ) {
+                /// @solidity memory-safe-assembly
                 assembly {
                     value := sload(slot)
                     indexFrom := add(indexFrom, 0x1)
@@ -820,12 +903,15 @@ library Uint256Array {
                 }
 
                 if (callback(value, comparativeValue)) {
-                    findedValue[0] = value;
-                    success = true;
+                    assembly {
+                        mstore(add(findedValue, 0x20), value)
+                        success := 0x01
+                    }
                     break;
                 }
             }
 
+            /// @solidity memory-safe-assembly
             assembly {
                 if iszero(success) {
                     mstore(findedValue, 0x00)
@@ -840,6 +926,8 @@ library Uint256Array {
         uint256 comparativeValue
     ) internal view returns (int256 index) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -854,6 +942,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (int256 index) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -874,7 +964,10 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal view returns (int256 index) {
+        uint256 len;
         bytes32 slot;
+
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -882,36 +975,42 @@ library Uint256Array {
                 revert(0x1c, 0x04)
             }
 
-            let len := sload(_self.slot)
-
-            if iszero(lt(indexTo, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
-            }
-
-            slot := add(sload(add(_self.slot, 0x01)), indexFrom)
-            indexTo := add(indexTo, 0x01)
-
+            len := sload(_self.slot)
             index := not(0x00)
+
+            if len {
+                if iszero(lt(indexTo, len)) {
+                    // IndexDoesNotExist()
+                    mstore(0x00, 0x2238ba58)
+                    revert(0x1c, 0x04)
+                }
+
+                slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+                indexTo := add(indexTo, 0x01)
+            }
         }
 
-        uint256 value;
-        for (; indexFrom < indexTo; ) {
-            assembly {
-                value := sload(slot)
-            }
-
-            if (callback(value, comparativeValue)) {
+        if (len > 0) {
+            uint256 value;
+            for (; indexFrom < indexTo; ) {
+                /// @solidity memory-safe-assembly
                 assembly {
-                    index := indexFrom
+                    value := sload(slot)
                 }
-                break;
-            }
 
-            assembly {
-                indexFrom := add(indexFrom, 0x01)
-                slot := add(slot, 0x01)
+                if (callback(value, comparativeValue)) {
+                    /// @solidity memory-safe-assembly
+                    assembly {
+                        index := indexFrom
+                    }
+                    break;
+                }
+
+                /// @solidity memory-safe-assembly
+                assembly {
+                    indexFrom := add(indexFrom, 0x01)
+                    slot := add(slot, 0x01)
+                }
             }
         }
     }
@@ -922,6 +1021,8 @@ library Uint256Array {
         uint256 comparativeValue
     ) internal view returns (int256 index) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -936,6 +1037,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (int256 index) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -956,8 +1059,11 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal view returns (int256 index) {
+        uint256 len;
         bytes32 slot;
         uint256 indexToCashed;
+
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -965,37 +1071,43 @@ library Uint256Array {
                 revert(0x1c, 0x04)
             }
 
-            let len := sload(_self.slot)
-
-            if iszero(lt(indexTo, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
-            }
-
-            slot := add(sload(add(_self.slot, 0x01)), indexTo)
-            indexToCashed := add(indexTo, 0x01)
-
+            len := sload(_self.slot)
             index := not(0x00)
+
+            if len {
+                if iszero(lt(indexTo, len)) {
+                    // IndexDoesNotExist()
+                    mstore(0x00, 0x2238ba58)
+                    revert(0x1c, 0x04)
+                }
+
+                slot := add(sload(add(_self.slot, 0x01)), indexTo)
+                indexToCashed := add(indexTo, 0x01)
+            }
         }
 
-        uint256 value;
-        for (; indexFrom < indexToCashed; ) {
-            assembly {
-                value := sload(slot)
-            }
-
-            if (callback(value, comparativeValue)) {
+        if (len > 0) {
+            uint256 value;
+            for (; indexFrom < indexToCashed; ) {
+                /// @solidity memory-safe-assembly
                 assembly {
-                    index := indexTo
+                    value := sload(slot)
                 }
-                break;
-            }
 
-            assembly {
-                indexFrom := add(indexFrom, 0x01)
-                indexTo := sub(indexTo, 0x01)
-                slot := sub(slot, 0x01)
+                if (callback(value, comparativeValue)) {
+                    /// @solidity memory-safe-assembly
+                    assembly {
+                        index := indexTo
+                    }
+                    break;
+                }
+
+                /// @solidity memory-safe-assembly
+                assembly {
+                    indexFrom := add(indexFrom, 0x01)
+                    indexTo := sub(indexTo, 0x01)
+                    slot := sub(slot, 0x01)
+                }
             }
         }
     }
@@ -1006,6 +1118,8 @@ library Uint256Array {
         uint256 calculationValue
     ) internal view returns (uint256[] memory newArray) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -1020,6 +1134,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (uint256[] memory newArray) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -1034,7 +1150,10 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal view returns (uint256[] memory newArray) {
+        uint256 len;
         bytes32 slot;
+
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -1042,43 +1161,52 @@ library Uint256Array {
                 revert(0x1c, 0x04)
             }
 
-            let len := sload(_self.slot)
+            len := sload(_self.slot)
 
-            if iszero(lt(indexTo, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
+            if len {
+                if iszero(lt(indexTo, len)) {
+                    // IndexDoesNotExist()
+                    mstore(0x00, 0x2238ba58)
+                    revert(0x1c, 0x04)
+                }
+
+                slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+                indexTo := add(indexTo, 0x01)
+
+                newArray := mload(0x40)
+                mstore(newArray, sub(indexTo, indexFrom))
             }
-
-            slot := add(sload(add(_self.slot, 0x01)), indexFrom)
-            indexTo := add(indexTo, 0x01)
-
-            newArray := mload(0x40)
-            mstore(newArray, sub(indexTo, indexFrom))
         }
 
-        bytes32 offset;
-        assembly {
-            offset := add(newArray, 0x20)
-        }
+        if (len > 0) {
+            bytes32 offset;
 
-        uint256 value;
-        for (; indexFrom < indexTo; ) {
+            /// @solidity memory-safe-assembly
             assembly {
-                value := sload(slot)
+                offset := add(newArray, 0x20)
             }
-            value = callback(value, calculationValue);
 
+            uint256 value;
+            for (; indexFrom < indexTo; ) {
+                /// @solidity memory-safe-assembly
+                assembly {
+                    value := sload(slot)
+                }
+                value = callback(value, calculationValue);
+
+                /// @solidity memory-safe-assembly
+                assembly {
+                    mstore(offset, value)
+                    offset := add(offset, 0x20)
+                    indexFrom := add(indexFrom, 0x01)
+                    slot := add(slot, 0x01)
+                }
+            }
+
+            /// @solidity memory-safe-assembly
             assembly {
-                mstore(offset, value)
-                offset := add(offset, 0x20)
-                indexFrom := add(indexFrom, 0x01)
-                slot := add(slot, 0x01)
+                mstore(0x40, offset)
             }
-        }
-
-        assembly {
-            mstore(0x40, offset)
         }
     }
 
@@ -1088,6 +1216,8 @@ library Uint256Array {
         uint256 calculationValue
     ) internal {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -1102,6 +1232,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -1116,7 +1248,10 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal {
+        uint256 len;
         bytes32 slot;
+
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -1124,35 +1259,43 @@ library Uint256Array {
                 revert(0x1c, 0x04)
             }
 
-            let len := sload(_self.slot)
+            len := sload(_self.slot)
 
-            if iszero(lt(indexTo, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
+            if len {
+                if iszero(lt(indexTo, len)) {
+                    // IndexDoesNotExist()
+                    mstore(0x00, 0x2238ba58)
+                    revert(0x1c, 0x04)
+                }
+
+                slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+                indexTo := add(indexTo, 0x01)
             }
-
-            slot := add(sload(add(_self.slot, 0x01)), indexFrom)
-            indexTo := add(indexTo, 0x01)
         }
 
-        uint256 value;
-        for (; indexFrom < indexTo; ) {
-            assembly {
-                value := sload(slot)
-            }
-            value = callback(value, calculationValue);
+        if (len > 0) {
+            uint256 value;
+            for (; indexFrom < indexTo; ) {
+                /// @solidity memory-safe-assembly
+                assembly {
+                    value := sload(slot)
+                }
+                value = callback(value, calculationValue);
 
-            assembly {
-                sstore(slot, value)
-                indexFrom := add(indexFrom, 0x01)
-                slot := add(slot, 0x01)
+                /// @solidity memory-safe-assembly
+                assembly {
+                    sstore(slot, value)
+                    indexFrom := add(indexFrom, 0x01)
+                    slot := add(slot, 0x01)
+                }
             }
         }
     }
 
     function reverse(CustomArray storage _self) internal {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -1162,6 +1305,8 @@ library Uint256Array {
 
     function reverse(CustomArray storage _self, uint256 indexFrom) internal {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -1174,6 +1319,7 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal {
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -1183,35 +1329,37 @@ library Uint256Array {
 
             let len := sload(_self.slot)
 
-            if iszero(lt(indexTo, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
-            }
+            if len {
+                if iszero(lt(indexTo, len)) {
+                    // IndexDoesNotExist()
+                    mstore(0x00, 0x2238ba58)
+                    revert(0x1c, 0x04)
+                }
 
-            len := add(sub(indexTo, indexFrom), 0x01)
-            switch and(len, 0x01)
-            case 0x00 {
-                len := shr(0x01, len)
-            }
-            case 0x01 {
-                len := shr(0x01, sub(len, 0x01))
-            }
+                len := add(sub(indexTo, indexFrom), 0x01)
+                switch and(len, 0x01)
+                case 0x00 {
+                    len := shr(0x01, len)
+                }
+                case 0x01 {
+                    len := shr(0x01, sub(len, 0x01))
+                }
 
-            for {
-                let slot := sload(add(_self.slot, 0x01))
-                let slotIndexFrom := add(slot, indexFrom)
-                let slotIndexTo := add(slot, indexTo)
+                for {
+                    let slot := sload(add(_self.slot, 0x01))
+                    let slotIndexFrom := add(slot, indexFrom)
+                    let slotIndexTo := add(slot, indexTo)
 
-                let value
-            } len {
-                len := sub(len, 0x01)
-                slotIndexFrom := add(slotIndexFrom, 0x01)
-                slotIndexTo := sub(slotIndexTo, 0x01)
-            } {
-                value := sload(slotIndexFrom)
-                sstore(slotIndexFrom, sload(slotIndexTo))
-                sstore(slotIndexTo, value)
+                    let value
+                } len {
+                    len := sub(len, 0x01)
+                    slotIndexFrom := add(slotIndexFrom, 0x01)
+                    slotIndexTo := sub(slotIndexTo, 0x01)
+                } {
+                    value := sload(slotIndexFrom)
+                    sstore(slotIndexFrom, sload(slotIndexTo))
+                    sstore(slotIndexTo, value)
+                }
             }
         }
     }
@@ -1222,6 +1370,8 @@ library Uint256Array {
         uint256 comparativeValue
     ) internal view returns (bool exists) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -1236,6 +1386,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (bool exists) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -1250,7 +1402,10 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal view returns (bool exists) {
+        uint256 len;
         bytes32 slot;
+
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -1258,34 +1413,41 @@ library Uint256Array {
                 revert(0x1c, 0x04)
             }
 
-            let len := sload(_self.slot)
+            len := sload(_self.slot)
 
-            if iszero(lt(indexTo, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
+            if len {
+                if iszero(lt(indexTo, len)) {
+                    // IndexDoesNotExist()
+                    mstore(0x00, 0x2238ba58)
+                    revert(0x1c, 0x04)
+                }
+
+                slot := add(sload(add(_self.slot, 0x01)), indexFrom)
+                indexTo := add(indexTo, 0x01)
             }
-
-            slot := add(sload(add(_self.slot, 0x01)), indexFrom)
-            indexTo := add(indexTo, 0x01)
         }
 
-        uint256 value;
-        for (; indexFrom < indexTo; ) {
-            assembly {
-                value := sload(slot)
-            }
-
-            if (callback(value, comparativeValue)) {
+        if (len > 0) {
+            uint256 value;
+            for (; indexFrom < indexTo; ) {
+                /// @solidity memory-safe-assembly
                 assembly {
-                    exists := 0x01
+                    value := sload(slot)
                 }
-                break;
-            }
 
-            assembly {
-                indexFrom := add(indexFrom, 0x01)
-                slot := add(slot, 0x01)
+                if (callback(value, comparativeValue)) {
+                    /// @solidity memory-safe-assembly
+                    assembly {
+                        exists := 0x01
+                    }
+                    break;
+                }
+
+                /// @solidity memory-safe-assembly
+                assembly {
+                    indexFrom := add(indexFrom, 0x01)
+                    slot := add(slot, 0x01)
+                }
             }
         }
     }
@@ -1296,6 +1458,8 @@ library Uint256Array {
         uint256 comparativeValue
     ) internal view returns (bool exists) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -1310,6 +1474,8 @@ library Uint256Array {
         uint256 indexFrom
     ) internal view returns (bool exists) {
         uint256 indexTo;
+
+        /// @solidity memory-safe-assembly
         assembly {
             indexTo := sub(sload(_self.slot), 0x01)
         }
@@ -1324,71 +1490,10 @@ library Uint256Array {
         uint256 indexFrom,
         uint256 indexTo
     ) internal view returns (bool exists) {
-        bytes32 slot;
-        assembly {
-            if gt(indexFrom, indexTo) {
-                // WrongArguments()
-                mstore(0x00, 0x666b2f97)
-                revert(0x1c, 0x04)
-            }
-
-            let len := sload(_self.slot)
-
-            if iszero(lt(indexTo, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
-            }
-
-            slot := add(sload(add(_self.slot, 0x01)), indexFrom)
-            indexTo := add(indexTo, 0x01)
-            exists := 0x01
-        }
-
-        uint256 value;
-        for (; indexFrom < indexTo; ) {
-            assembly {
-                value := sload(slot)
-            }
-
-            if (!callback(value, comparativeValue)) {
-                assembly {
-                    exists := 0x00
-                }
-                break;
-            }
-
-            assembly {
-                indexFrom := add(indexFrom, 0x01)
-                slot := add(slot, 0x01)
-            }
-        }
-    }
-
-    function sort(CustomArray storage _self) internal {
-        uint256 indexTo;
-        assembly {
-            indexTo := sub(sload(_self.slot), 0x01)
-        }
-
-        sort(_self, 0, indexTo);
-    }
-
-    function sort(CustomArray storage _self, uint256 indexFrom) internal {
-        uint256 indexTo;
-        assembly {
-            indexTo := sub(sload(_self.slot), 0x01)
-        }
-
-        sort(_self, indexFrom, indexTo);
-    }
-
-    function sort(
-        CustomArray storage _self,
-        uint256 indexFrom,
-        uint256 indexTo
-    ) internal {
         uint256 len;
+        bytes32 slot;
+
+        /// @solidity memory-safe-assembly
         assembly {
             if gt(indexFrom, indexTo) {
                 // WrongArguments()
@@ -1398,138 +1503,40 @@ library Uint256Array {
 
             len := sload(_self.slot)
 
-            if iszero(lt(indexTo, len)) {
-                // IndexDoesNotExist()
-                mstore(0x00, 0x2238ba58)
-                revert(0x1c, 0x04)
-            }
-        }
-        quickSort(_self, indexFrom, indexTo);
-    }
+            if len {
+                if iszero(lt(indexTo, len)) {
+                    // IndexDoesNotExist()
+                    mstore(0x00, 0x2238ba58)
+                    revert(0x1c, 0x04)
+                }
 
-    function bubbleSort(
-        CustomArray storage _self,
-        uint256 indexFrom,
-        uint256 indexTo
-    ) internal {
-        assembly {
-            for {
+                slot := add(sload(add(_self.slot, 0x01)), indexFrom)
                 indexTo := add(indexTo, 0x01)
-                let len := sub(indexTo, indexFrom)
-
-                let swapped
-                let slot := add(sload(add(_self.slot, 0x01)), indexFrom)
-            } len {
-                swapped := 0x00
-            } {
-                len := sub(len, 0x01)
-
-                for {
-                    let i
-                    let nextSlot
-                    let currentSlot := slot
-                    let currentValue := sload(slot)
-                    let nextValue
-                } lt(i, len) {
-                    i := add(i, 0x01)
-                    currentSlot := nextSlot
-                } {
-                    nextSlot := add(currentSlot, 0x01)
-                    nextValue := sload(nextSlot)
-
-                    switch gt(currentValue, nextValue)
-                    case 0x01 {
-                        sstore(currentSlot, nextValue)
-                        sstore(nextSlot, currentValue)
-                        swapped := 0x01
-                    }
-                    default {
-                        currentValue := nextValue
-                    }
-                }
-
-                if iszero(swapped) {
-                    break
-                }
+                exists := 0x01
             }
         }
-    }
 
-    function quickSort(
-        CustomArray storage _self,
-        uint256 indexFrom,
-        uint256 indexTo
-    ) private {
-        assembly {
-            for {
-                mstore(0x20, sload(add(_self.slot, 0x01)))
-                let stack := mload(0x40)
-                mstore(stack, indexFrom)
-                mstore(add(stack, 0x20), indexTo)
-                stack := add(stack, 0x40)
-                let stackLen := 0x1
+        if (len > 0) {
+            uint256 value;
+            for (; indexFrom < indexTo; ) {
+                /// @solidity memory-safe-assembly
+                assembly {
+                    value := sload(slot)
+                }
 
-                let low
-                let high
-                let pivot
-            } stackLen {
-
-            } {
-                stack := sub(stack, 0x40)
-                low := mload(stack)
-                high := mload(add(stack, 0x20))
-                stackLen := sub(stackLen, 0x01)
-
-                pivot := partition(low, high)
-
-                if pivot {
-                    if gt(sub(pivot, 0x01), low) {
-                        mstore(stack, low)
-                        mstore(add(stack, 0x20), sub(pivot, 0x01))
-                        stack := add(stack, 0x40)
-                        stackLen := add(stackLen, 0x01)
+                if (!callback(value, comparativeValue)) {
+                    /// @solidity memory-safe-assembly
+                    assembly {
+                        exists := 0x00
                     }
+                    break;
                 }
 
-                if lt(add(pivot, 0x01), high) {
-                    mstore(stack, add(pivot, 0x01))
-                    mstore(add(stack, 0x20), high)
-                    stack := add(stack, 0x40)
-                    stackLen := add(stackLen, 0x01)
+                /// @solidity memory-safe-assembly
+                assembly {
+                    indexFrom := add(indexFrom, 0x01)
+                    slot := add(slot, 0x01)
                 }
-            }
-
-            function partition(low, high) -> index {
-                let slot := mload(0x20)
-
-                let pivot := sload(add(slot, high))
-                let i := sub(low, 0x01)
-                let slotI
-                let value
-
-                for {
-                    let j := low
-                    let slotJ
-                } lt(j, high) {
-                    j := add(j, 0x01)
-                } {
-                    slotJ := add(slot, j)
-                    value := sload(slotJ)
-
-                    if iszero(gt(value, pivot)) {
-                        i := add(i, 0x01)
-                        slotI := add(slot, i)
-                        sstore(slotJ, sload(slotI))
-                        sstore(slotI, value)
-                    }
-                }
-
-                slotI := add(slot, add(i, 0x01))
-                value := sload(slotI)
-                sstore(slotI, sload(add(slot, high)))
-                sstore(add(slot, high), value)
-
-                index := add(i, 0x01)
             }
         }
     }
@@ -1540,30 +1547,35 @@ library Uint256Array {
 // -----------------------------------------------------
 
 function lt(uint256 a, uint256 b) pure returns (bool result) {
+    /// @solidity memory-safe-assembly
     assembly {
         result := lt(a, b)
     }
 }
 
 function gt(uint256 a, uint256 b) pure returns (bool result) {
+    /// @solidity memory-safe-assembly
     assembly {
         result := gt(a, b)
     }
 }
 
 function eq(uint256 a, uint256 b) pure returns (bool result) {
+    /// @solidity memory-safe-assembly
     assembly {
         result := eq(a, b)
     }
 }
 
 function lte(uint256 a, uint256 b) pure returns (bool result) {
+    /// @solidity memory-safe-assembly
     assembly {
         result := iszero(gt(a, b))
     }
 }
 
 function gte(uint256 a, uint256 b) pure returns (bool result) {
+    /// @solidity memory-safe-assembly
     assembly {
         result := iszero(lt(a, b))
     }
@@ -1574,6 +1586,7 @@ error Underflow();
 error DivisionByZero();
 
 function add(uint256 a, uint256 b) pure returns (uint256 result) {
+    /// @solidity memory-safe-assembly
     assembly {
         result := add(a, b)
 
@@ -1585,6 +1598,7 @@ function add(uint256 a, uint256 b) pure returns (uint256 result) {
 }
 
 function sub(uint256 a, uint256 b) pure returns (uint256 result) {
+    /// @solidity memory-safe-assembly
     assembly {
         result := sub(a, b)
 
@@ -1596,6 +1610,7 @@ function sub(uint256 a, uint256 b) pure returns (uint256 result) {
 }
 
 function mul(uint256 a, uint256 b) pure returns (uint256 result) {
+    /// @solidity memory-safe-assembly
     assembly {
         result := mul(a, b)
 
@@ -1607,6 +1622,7 @@ function mul(uint256 a, uint256 b) pure returns (uint256 result) {
 }
 
 function div(uint256 a, uint256 b) pure returns (uint256 result) {
+    /// @solidity memory-safe-assembly
     assembly {
         if iszero(b) {
             mstore(0x00, 0x23d359a3)
@@ -1618,6 +1634,7 @@ function div(uint256 a, uint256 b) pure returns (uint256 result) {
 }
 
 function mod(uint256 a, uint256 b) pure returns (uint256 result) {
+    /// @solidity memory-safe-assembly
     assembly {
         if iszero(b) {
             mstore(0x00, 0x23d359a3)
@@ -1629,6 +1646,7 @@ function mod(uint256 a, uint256 b) pure returns (uint256 result) {
 }
 
 function pow(uint256 a, uint256 b) pure returns (uint256 result) {
+    /// @solidity memory-safe-assembly
     assembly {
         switch b
         case 0x00 {
@@ -1705,6 +1723,7 @@ function pow(uint256 a, uint256 b) pure returns (uint256 result) {
 }
 
 function xor(uint256 a, uint256 b) pure returns (uint256 result) {
+    /// @solidity memory-safe-assembly
     assembly {
         result := xor(a, b)
     }
