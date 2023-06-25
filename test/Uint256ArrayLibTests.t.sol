@@ -3,11 +3,11 @@ pragma solidity ^0.8.19;
 
 import {console2, Test} from "forge-std/Test.sol";
 import {Solarray} from "solarray/Solarray.sol";
-import {Uint256Array, lt, lte, gt, gte, eq, add, sub, mul, div, mod, pow, xor} from "src/Uint256Array.sol";
+import {Uint256Array, lt, lte, gt, gte, eq, add, sub, mul, div, mod, pow, xor} from "../src/Uint256Array.sol";
 import {RevertTesterHelperU256} from "./RevertTesterHelperU256.sol";
 
 contract Uint256ArrayLibTests is Test {
-    using Uint256Array for *;
+    using Uint256Array for Uint256Array.CustomArray;
 
     Uint256Array.CustomArray private u256;
     RevertTesterHelperU256 private revertHelper;

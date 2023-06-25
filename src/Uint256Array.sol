@@ -280,7 +280,7 @@ library Uint256Array {
     }
 
     /**
-     * @dev Adds all values of the passed array to the end of the array..
+     * @dev Adds all values of the passed array to the end of the array.
      *
      * [1, 2, 3] -> concat([4, 5, 6]) -> [1, 2, 3, 4, 5, 6]
      */
@@ -1748,9 +1748,8 @@ library Uint256Array {
     }
 
     /**
-     * @dev Swaps the elements of the array so that the first element becomes the last,
-     * and the last one becomes the first. That is, the order of the elements
-     * in the array will be reversed. The function modifies the array.
+     * @dev Swaps the elements in the array mirrorwise.
+     * The function modifies the array.
      *
      * If array have no elements, does nothing.
      */
@@ -1766,9 +1765,7 @@ library Uint256Array {
     }
 
     /**
-     * @dev Swaps the elements of the array in range [`indexFrom`, len-1] so that
-     * the first element becomes the last, and the last one becomes the first.
-     * That is, the order of the elements in the array will be reversed.
+     * @dev Swaps the elements in the array in range [`indexFrom`, len-1] mirrorwise.
      * The function modifies the array.
      *
      * Requirements:
@@ -1788,9 +1785,7 @@ library Uint256Array {
     }
 
     /**
-     * @dev Swaps the elements of the array in range [`indexFrom`, `indexTo`] so that
-     * the first element becomes the last, and the last one becomes the first.
-     * That is, the order of the elements in the array will be reversed.
+     * @dev Swaps the elements in the array in range [`indexFrom`, `indexTo`] mirrorwise.
      * The function modifies the array.
      *
      * Requirements:
