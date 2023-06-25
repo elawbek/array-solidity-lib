@@ -54,7 +54,7 @@ contract Contract {
 | `find`           |  Returns the first element in the array that satisfies the provided testing function                                          |
 | `findLast`       |  Iterates the array in reverse order and returns the value of the first element that satisfies the provided testing function  |
 | `findIndex`      |  Returns the index of the first element in an array that satisfies the provided testing function                              |
-| `findLastIndex`  |  terates the array in reverse order and returns the index of the first element that satisfies the provided testing function   |
+| `findLastIndex`  |  Cterates the array in reverse order and returns the index of the first element that satisfies the provided testing function  |
 | `map`            |  Creates a copy of an array start to end populated with the results of calling a provided function on every element           |
 | `forEach`        |  Executes a provided function once for each array element                                                                     |
 | `reverse`        |  Swaps the elements in the array mirrorwise                                                                                   |
