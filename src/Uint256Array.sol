@@ -2,39 +2,8 @@
 pragma solidity ^0.8.0;
 
 /**
-    [x] length
-    [x] at
-       - [x] negative index (from end)
-    [x] slice
-    [x] push
-    [x] unshift
-    [x] concat
-    [x] pop
-    [x] shift
-    [x] update
-    [x] remove
-    [x] includes
-    [x] fill
-    [x] indexOf & lastIndexOf
-    [x] filter
-       - [x] lt, gt, eq, lte, gte
-    [x] find & findLast
-       - [x] lt, gt, eq, lte, gte
-    [x] findIndex & findLastIndex
-       - [x] lt, gt, eq, lte, gte
-    [x] map
-       - [x] add, sub, mul, div, mod, pow, xor
-    [x] forEach
-       - [x] add, sub, mul, div, mod, pow, xor
-    [x] reverse
-    [x] some
-       - [x] lt, gt, eq, lte, gte
-    [x] every
-       - [x] lt, gt, eq, lte, gte
- */
-
-/**
- * @dev Collection of functions related to the custom uint256 array type
+ * @dev Collection of functions related to the custom uint256 array type.
+ * The library was created by building on existing array methods in `javascript`.
  */
 library Uint256Array {
     error IndexDoesNotExist();
@@ -66,7 +35,7 @@ library Uint256Array {
      * Allowing for positive and negative integers. Negative integers
      * count back from the last item in the array.
      *
-     *  Requirements:
+     * Requirements:
      * - the `index` value must be in the range [-len; len-1].
      */
     function at(
@@ -91,8 +60,7 @@ library Uint256Array {
     }
 
     /**
-     * @dev Returns a copy of an array start to end where start
-     * and end represent the index of items in that array.
+     * @dev Returns a copy of an array start to end.
      * The original array will not be modified.
      *
      * Returns an empty array if it has no elements.
@@ -110,15 +78,13 @@ library Uint256Array {
     }
 
     /**
-     * @dev Returns a copy of an array from `indexFrom` to end
-     * where `indexFrom` and end represent the index of items in that array
-     * and `indexFrom` is the argument of the function.
+     * @dev Returns a copy of an array in range [`indexFrom`, len-1].
      * The original array will not be modified.
      *
-     *  Requirements:
+     * Requirements:
      * - `indexFrom` must be less than or equal to len-1.
      *
-     * Returns an empty array if it has no elements. NOTE: `indexFrom` must be equal 0.
+     * Returns an empty array if it has no elements.
      */
     function slice(
         CustomArray storage _self,
@@ -134,20 +100,17 @@ library Uint256Array {
     }
 
     /**
-     * @dev Returns a copy of an array from `indexFrom` to `indexTo`
-     * where `indexFrom` and `indexTo` represent the index of items in that array
-     * and are arguments of the function .
+     * @dev Returns a copy of an array in range [`indexFrom`, `indexTo`].
      * The original array will not be modified.
      *
-     *  Requirements:
+     * Requirements:
      * - `indexTo` must be less than the length of the array.
      * - `indexFrom` must be less than or equal to `indexTo`.
-     * - `indexFrom` must be less than or equal to len-1.
      *
      * Returns an empty array if it has no elements.
      * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
      * are not validated with respect to the array length and can be any
-     * (this is not an error, the result will be an empty array).
+     * (this is not an error).
      */
     function slice(
         CustomArray storage _self,
@@ -319,7 +282,7 @@ library Uint256Array {
     /**
      * @dev Adds all values of the passed array to the end of the array..
      *
-     * [1, 2, 3] -> concat([4, 5, 6]) -> [4, 5, 6, 1, 2, 3]
+     * [1, 2, 3] -> concat([4, 5, 6]) -> [1, 2, 3, 4, 5, 6]
      */
     function concat(
         CustomArray storage _self,
@@ -349,6 +312,8 @@ library Uint256Array {
     /**
      * @dev Removes the last element from an array and returns that element.
      * This method changes the length of the array.
+     *
+     * Returns an error if the array has no elements.
      */
     function pop(CustomArray storage _self) internal returns (uint256 elem) {
         /// @solidity memory-safe-assembly
@@ -370,6 +335,12 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Removes the first element from an array and returns that element.
+     * This method changes the length of the array.
+     *
+     * Returns an error if the array has no elements.
+     */
     function shift(CustomArray storage _self) internal returns (uint256 elem) {
         /// @solidity memory-safe-assembly
         assembly {
@@ -391,6 +362,18 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Takes an integer value and update the item at that `index`.
+     * Allowing for positive and negative integers. Negative integers
+     * count back from the last item in the array.
+     *
+     * Requirements:
+     * - the `index` value must be in the range [-len; len-1].
+     *
+     * Returns an error if the array has no elements.
+     *
+     * [1, 2, 3, 4] -> update(2, 5) -> [1, 2, 5, 4]
+     */
     function update(
         CustomArray storage _self,
         int256 index,
@@ -413,17 +396,23 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Takes an integer value and remove the item at that `index` replacing
+     * it with the last element of the array. Allowing for positive and
+     * negative integers. Negative integers count back from the last
+     * item in the array.
+     *
+     * Requirements:
+     * - the `index` value must be in the range [-len; len-1].
+     *
+     * Returns an error if the array has no elements.
+     *
+     * [1, 2, 3, 4, 5] -> remove(1) -> [1, 5, 3, 4]
+     */
     function remove(CustomArray storage _self, int256 index) internal {
         /// @solidity memory-safe-assembly
         assembly {
             let len := sload(_self.slot)
-
-            if iszero(len) {
-                // ArrayIsEmpty()
-                mstore(0x00, 0x5585048a)
-                revert(0x1c, 0x04)
-            }
-
             if shr(0xff, index) {
                 index := sub(len, add(not(index), 0x01))
             }
@@ -445,6 +434,12 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Determines whether an array includes a certain value.
+     * Returning `true` or `false` as appropriate.
+     *
+     * Returns `false` if the array has no elements.
+     */
     function includes(
         CustomArray storage _self,
         uint256 value
@@ -458,6 +453,15 @@ library Uint256Array {
         result = includes(_self, value, 0, indexTo);
     }
 
+    /**
+     * @dev Determines whether an array in range [`indexFrom`, len-1] includes a certain value.
+     * Returning `true` or `false` as appropriate.
+     *
+     * Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * If no values satisfy the testing function or array have no elements, `false` is returned.
+     */
     function includes(
         CustomArray storage _self,
         uint256 value,
@@ -472,6 +476,19 @@ library Uint256Array {
         result = includes(_self, value, indexFrom, indexTo);
     }
 
+    /**
+     * @dev Determines whether an array in range [`indexFrom`, `indexTo`] includes a certain value.
+     * Returning `true` or `false` as appropriate.
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * If no values satisfy the testing function or array have no elements, `false` is returned.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function includes(
         CustomArray storage _self,
         uint256 value,
@@ -510,6 +527,11 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Changes all elements in an array to a static value.
+     *
+     * Returns an error if the array has no elements.
+     */
     function fillState(CustomArray storage _self, uint256 value) internal {
         uint256 indexTo;
 
@@ -520,6 +542,14 @@ library Uint256Array {
         fillState(_self, value, 0, indexTo);
     }
 
+    /**
+     * @dev Changes all elements in an array in range [`indexFrom`, len-1] to a static value.
+     *
+     * Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * Returns an error if the array has no elements.
+     */
     function fillState(
         CustomArray storage _self,
         uint256 value,
@@ -534,6 +564,15 @@ library Uint256Array {
         fillState(_self, value, indexFrom, indexTo);
     }
 
+    /**
+     * @dev Changes all elements in an array in range [`indexFrom`, `indexTo`] to a static value.
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * Returns an error if the array has no elements.
+     */
     function fillState(
         CustomArray storage _self,
         uint256 value,
@@ -542,17 +581,17 @@ library Uint256Array {
     ) internal {
         /// @solidity memory-safe-assembly
         assembly {
-            if gt(indexFrom, indexTo) {
-                // WrongArguments()
-                mstore(0x00, 0x666b2f97)
-                revert(0x1c, 0x04)
-            }
-
             let len := sload(_self.slot)
 
             if iszero(len) {
                 // ArrayIsEmpty()
                 mstore(0x00, 0x5585048a)
+                revert(0x1c, 0x04)
+            }
+
+            if gt(indexFrom, indexTo) {
+                // WrongArguments()
+                mstore(0x00, 0x666b2f97)
                 revert(0x1c, 0x04)
             }
 
@@ -573,6 +612,12 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Returns the first index at which a given element can be found in the array,
+     * or -1 if it is not present.
+     *
+     * Returns -1 if the array has no elements.
+     */
     function indexOf(
         CustomArray storage _self,
         uint256 value
@@ -587,6 +632,15 @@ library Uint256Array {
         index = indexOf(_self, value, 0, indexTo);
     }
 
+    /**
+     * @dev Returns the first index at which a given element can be found in the array
+     * in range [`indexFrom`, len-1], or -1 if it is not present.
+     *
+     * Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * Returns -1 if the array has no elements.
+     */
     function indexOf(
         CustomArray storage _self,
         uint256 value,
@@ -602,6 +656,19 @@ library Uint256Array {
         index = indexOf(_self, value, indexFrom, indexTo);
     }
 
+    /**
+     * @dev Returns the first index at which a given element can be found in the array
+     * in range [`indexFrom`, `indexTo`], or -1 if it is not present.
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * Returns -1 if the array has no elements.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function indexOf(
         CustomArray storage _self,
         uint256 value,
@@ -641,6 +708,12 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Returns the last index at which a given element can be found in the array,
+     * or -1 if it is not present.
+     *
+     * Returns -1 if the array has no elements.
+     */
     function lastIndexOf(
         CustomArray storage _self,
         uint256 value
@@ -655,6 +728,15 @@ library Uint256Array {
         index = lastIndexOf(_self, value, 0, indexTo);
     }
 
+    /**
+     * @dev Returns the last index at which a given element can be found in the array
+     * in range [`indexFrom`, len-1], or -1 if it is not present.
+     *
+     * Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * Returns -1 if the array has no elements.
+     */
     function lastIndexOf(
         CustomArray storage _self,
         uint256 value,
@@ -670,6 +752,19 @@ library Uint256Array {
         index = lastIndexOf(_self, value, indexFrom, indexTo);
     }
 
+    /**
+     * @dev Returns the last index at which a given element can be found in the array
+     * in range [`indexFrom`, `indexTo`], or -1 if it is not present.
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * Returns -1 if the array has no elements.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function lastIndexOf(
         CustomArray storage _self,
         uint256 value,
@@ -711,6 +806,15 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Creates a copy of a array filtered down to just the elements from that pass the test
+     * implemented by the provided function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * If no values satisfy the testing function or array have no elements, an empty array is returned.
+     */
     function filter(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -726,6 +830,19 @@ library Uint256Array {
         filteredArray = filter(_self, callback, comparativeValue, 0, indexTo);
     }
 
+    /**
+     * @dev Creates a copy of a array in range [`indexFrom`, len-1] filtered down to just
+     * the elements from that pass the test implemented by the provided function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * an empty array is returned.
+     */
     function filter(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -748,6 +865,23 @@ library Uint256Array {
         );
     }
 
+    /**
+     * @dev Creates a copy of a array in range [`indexFrom`, `indexTo`] filtered down to just
+     * the elements from that pass the test implemented by the provided function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * an empty array is returned.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function filter(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -811,6 +945,15 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Returns the first element in the array that satisfies the provided testing function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * an empty array is returned.
+     */
     function find(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -826,6 +969,18 @@ library Uint256Array {
         findedValue = find(_self, callback, comparativeValue, 0, indexTo);
     }
 
+    /**
+     * @dev Returns the first element in the array in range [`indexFrom`, len-1] that satisfies
+     * the provided testing function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * Returns an empty array if it has no elements.
+     */
     function find(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -848,6 +1003,22 @@ library Uint256Array {
         );
     }
 
+    /**
+     * @dev Returns the first element in the array in range [`indexFrom`, `indexTo`] that satisfies
+     * the provided testing function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * Returns an empty array if it has no elements.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function find(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -910,6 +1081,19 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Iterates the array in reverse order and returns the value of the first element
+     * that satisfies the provided testing function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     *  Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * If no value satisfy the testing function or array have no elements,
+     * an empty array is returned.
+     */
     function findLast(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -925,6 +1109,19 @@ library Uint256Array {
         findedValue = findLast(_self, callback, comparativeValue, 0, indexTo);
     }
 
+    /**
+     * @dev Iterates the array in range [`indexFrom`, len-1] in reverse order and returns
+     * the value of the first element that satisfies the provided testing function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * If no value satisfy the testing function or array have no elements,
+     * an empty array is returned.
+     */
     function findLast(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -947,6 +1144,23 @@ library Uint256Array {
         );
     }
 
+    /**
+     * @dev Iterates the array in range [`indexFrom`, `indexTo`] in reverse order and returns
+     * the value of the first element that satisfies the provided testing function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * If no value satisfy the testing function or array have no elements,
+     * an empty array is returned.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function findLast(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1010,6 +1224,13 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Returns the index of the first element in an array
+     * that satisfies the provided testing function.
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * -1 is returned.
+     */
     function findIndex(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1025,6 +1246,16 @@ library Uint256Array {
         index = findIndex(_self, callback, comparativeValue, 0, indexTo);
     }
 
+    /**
+     * @dev Returns the index of the first element in an array in range [`indexFrom`, len-1]
+     * that satisfies the provided testing function.
+     *
+     * Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * -1 is returned.
+     */
     function findIndex(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1047,6 +1278,20 @@ library Uint256Array {
         );
     }
 
+    /**
+     * @dev Returns the index of the first element in an array in range [`indexFrom`, `indexTo`]
+     * that satisfies the provided testing function.
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * -1 is returned.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function findIndex(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1105,6 +1350,16 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Iterates the array in reverse order and returns the index of the first element
+     * that satisfies the provided testing function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * -1 is returned.
+     */
     function findLastIndex(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1120,6 +1375,19 @@ library Uint256Array {
         index = findLastIndex(_self, callback, comparativeValue, 0, indexTo);
     }
 
+    /**
+     * @dev Iterates the array in range [`indexFrom`, len-1] in reverse order and returns
+     * the index of the first element that satisfies the provided testing function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * -1 is returned.
+     */
     function findLastIndex(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1142,6 +1410,23 @@ library Uint256Array {
         );
     }
 
+    /**
+     * @dev Iterates the array in range [`indexFrom`, `indexTo`] in reverse order and returns
+     * the index of the first element that satisfies the provided testing function.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * -1 is returned.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function findLastIndex(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1202,6 +1487,16 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Creates a copy of an array start to end populated with the results
+     * of calling a provided function on every element.
+     *
+     * Functions are defined in the library:
+     * add, sub, mul, div, mod, pow, xor
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * an empty array is returned.
+     */
     function map(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (uint256) callback,
@@ -1217,6 +1512,19 @@ library Uint256Array {
         newArray = map(_self, callback, calculationValue, 0, indexTo);
     }
 
+    /**
+     * @dev Creates a copy of an array in range [`indexFrom`, len-1] populated
+     * with the results of calling a provided function on every element.
+     *
+     * Functions are defined in the library:
+     * add, sub, mul, div, mod, pow, xor
+     *
+     * Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * an empty array is returned.
+     */
     function map(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (uint256) callback,
@@ -1233,6 +1541,23 @@ library Uint256Array {
         newArray = map(_self, callback, calculationValue, indexFrom, indexTo);
     }
 
+    /**
+     * @dev Creates a copy of an array in range [`indexFrom`, `indexTo`] populated
+     * with the results of calling a provided function on every element.
+     *
+     * Functions are defined in the library:
+     * add, sub, mul, div, mod, pow, xor
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * an empty array is returned.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function map(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (uint256) callback,
@@ -1300,6 +1625,16 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Executes a provided function once for each array element.
+     * The function modifies the array.
+     *
+     * Functions are defined in the library:
+     * add, sub, mul, div, mod, pow, xor
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * does nothing.
+     */
     function forEach(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (uint256) callback,
@@ -1315,6 +1650,19 @@ library Uint256Array {
         forEach(_self, callback, calculationValue, 0, indexTo);
     }
 
+    /**
+     * @dev Executes a provided function once for each array element
+     * in range [`indexFrom`, len-1]. The function modifies the array.
+     *
+     * Functions are defined in the library:
+     * add, sub, mul, div, mod, pow, xor
+     *
+     * Requirements:
+     * - `indexFrom` must be less than or equal to len-1.
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * does nothing.
+     */
     function forEach(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (uint256) callback,
@@ -1331,6 +1679,23 @@ library Uint256Array {
         forEach(_self, callback, calculationValue, indexFrom, indexTo);
     }
 
+    /**
+     * @dev Executes a provided function once for each array element
+     * in range [`indexFrom`, `indexTo`]. The function modifies the array.
+     *
+     * Functions are defined in the library:
+     * add, sub, mul, div, mod, pow, xor
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * If no values satisfy the testing function or array have no elements,
+     * does nothing.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function forEach(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (uint256) callback,
@@ -1382,6 +1747,13 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Swaps the elements of the array so that the first element becomes the last,
+     * and the last one becomes the first. That is, the order of the elements
+     * in the array will be reversed. The function modifies the array.
+     *
+     * If array have no elements, does nothing.
+     */
     function reverse(CustomArray storage _self) internal {
         uint256 indexTo;
 
@@ -1393,6 +1765,17 @@ library Uint256Array {
         reverse(_self, 0, indexTo);
     }
 
+    /**
+     * @dev Swaps the elements of the array in range [`indexFrom`, len-1] so that
+     * the first element becomes the last, and the last one becomes the first.
+     * That is, the order of the elements in the array will be reversed.
+     * The function modifies the array.
+     *
+     * Requirements:
+     * -`indexFrom` must be less than or equal to len-1.
+     *
+     * If array have no elements, does nothing.
+     */
     function reverse(CustomArray storage _self, uint256 indexFrom) internal {
         uint256 indexTo;
 
@@ -1404,6 +1787,21 @@ library Uint256Array {
         reverse(_self, indexFrom, indexTo);
     }
 
+    /**
+     * @dev Swaps the elements of the array in range [`indexFrom`, `indexTo`] so that
+     * the first element becomes the last, and the last one becomes the first.
+     * That is, the order of the elements in the array will be reversed.
+     * The function modifies the array.
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * If array have no elements, does nothing.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function reverse(
         CustomArray storage _self,
         uint256 indexFrom,
@@ -1454,6 +1852,15 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Tests whether at least one element in the array passes the test
+     * implemented by the provided function. It doesn't modify the array.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Returns `false` if the array has no elements.
+     */
     function some(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1469,6 +1876,18 @@ library Uint256Array {
         exists = some(_self, callback, comparativeValue, 0, indexTo);
     }
 
+    /**
+     * @dev Tests whether at least one element in the array in range [`indexFrom`, len-1]
+     * passes the test implemented by the provided function. It doesn't modify the array.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * -`indexFrom` must be less than or equal to len-1.
+     *
+     * Returns `false` if the array has no elements.
+     */
     function some(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1485,6 +1904,22 @@ library Uint256Array {
         exists = some(_self, callback, comparativeValue, indexFrom, indexTo);
     }
 
+    /**
+     * @dev Tests whether at least one element in the array in range [`indexFrom`, `indexTo`]
+     * passes the test implemented by the provided function. It doesn't modify the array.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * Returns `false` if the array has no elements.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function some(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1542,6 +1977,15 @@ library Uint256Array {
         }
     }
 
+    /**
+     * @dev Tests whether all elements in the array pass the test implemented
+     * by the provided function. It doesn't modify the array.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Returns `false` if the array has no elements.
+     */
     function every(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1557,6 +2001,18 @@ library Uint256Array {
         exists = every(_self, callback, comparativeValue, 0, indexTo);
     }
 
+    /**
+     * @dev Tests whether all elements in the array in range [`indexFrom`, len-1] pass
+     * the test implemented by the provided function. It doesn't modify the array.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * -`indexFrom` must be less than or equal to len-1.
+     *
+     * Returns `false` if the array has no elements.
+     */
     function every(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1573,6 +2029,22 @@ library Uint256Array {
         exists = every(_self, callback, comparativeValue, indexFrom, indexTo);
     }
 
+    /**
+     * @dev Tests whether all elements in the array in range [`indexFrom`, `indexTo`] pass
+     * the test implemented by the provided function. It doesn't modify the array.
+     *
+     * Functions are defined in the library:
+     * lt, lte, gt, gte, eq, neq
+     *
+     * Requirements:
+     * - `indexTo` must be less than the length of the array.
+     * - `indexFrom` must be less than or equal to `indexTo`.
+     *
+     * Returns `false` if the array has no elements.
+     * NOTE: If the array is empty, the passed values `indexFrom` and `indexTo`
+     * are not validated with respect to the array length and can be any
+     * (this is not an error).
+     */
     function every(
         CustomArray storage _self,
         function(uint256, uint256) pure returns (bool) callback,
@@ -1636,6 +2108,9 @@ library Uint256Array {
 // callbacks
 // -----------------------------------------------------
 
+/**
+ * @dev a < b
+ */
 function lt(uint256 a, uint256 b) pure returns (bool result) {
     /// @solidity memory-safe-assembly
     assembly {
@@ -1643,6 +2118,9 @@ function lt(uint256 a, uint256 b) pure returns (bool result) {
     }
 }
 
+/**
+ * @dev a > b
+ */
 function gt(uint256 a, uint256 b) pure returns (bool result) {
     /// @solidity memory-safe-assembly
     assembly {
@@ -1650,6 +2128,9 @@ function gt(uint256 a, uint256 b) pure returns (bool result) {
     }
 }
 
+/**
+ * @dev a == b
+ */
 function eq(uint256 a, uint256 b) pure returns (bool result) {
     /// @solidity memory-safe-assembly
     assembly {
@@ -1657,6 +2138,19 @@ function eq(uint256 a, uint256 b) pure returns (bool result) {
     }
 }
 
+/**
+ * @dev a != b
+ */
+function neq(uint256 a, uint256 b) pure returns (bool result) {
+    /// @solidity memory-safe-assembly
+    assembly {
+        result := iszero(eq(a, b))
+    }
+}
+
+/**
+ * @dev a <= b
+ */
 function lte(uint256 a, uint256 b) pure returns (bool result) {
     /// @solidity memory-safe-assembly
     assembly {
@@ -1664,6 +2158,9 @@ function lte(uint256 a, uint256 b) pure returns (bool result) {
     }
 }
 
+/**
+ * @dev a >= b
+ */
 function gte(uint256 a, uint256 b) pure returns (bool result) {
     /// @solidity memory-safe-assembly
     assembly {
@@ -1675,6 +2172,9 @@ error Overflow();
 error Underflow();
 error DivisionByZero();
 
+/**
+ * @dev result = a + b
+ */
 function add(uint256 a, uint256 b) pure returns (uint256 result) {
     /// @solidity memory-safe-assembly
     assembly {
@@ -1687,6 +2187,9 @@ function add(uint256 a, uint256 b) pure returns (uint256 result) {
     }
 }
 
+/**
+ * @dev result = a - b
+ */
 function sub(uint256 a, uint256 b) pure returns (uint256 result) {
     /// @solidity memory-safe-assembly
     assembly {
@@ -1699,6 +2202,9 @@ function sub(uint256 a, uint256 b) pure returns (uint256 result) {
     }
 }
 
+/**
+ * @dev result = a * b
+ */
 function mul(uint256 a, uint256 b) pure returns (uint256 result) {
     /// @solidity memory-safe-assembly
     assembly {
@@ -1711,6 +2217,9 @@ function mul(uint256 a, uint256 b) pure returns (uint256 result) {
     }
 }
 
+/**
+ * @dev result = a / b
+ */
 function div(uint256 a, uint256 b) pure returns (uint256 result) {
     /// @solidity memory-safe-assembly
     assembly {
@@ -1723,6 +2232,9 @@ function div(uint256 a, uint256 b) pure returns (uint256 result) {
     }
 }
 
+/**
+ * @dev result = a % b
+ */
 function mod(uint256 a, uint256 b) pure returns (uint256 result) {
     /// @solidity memory-safe-assembly
     assembly {
@@ -1735,6 +2247,9 @@ function mod(uint256 a, uint256 b) pure returns (uint256 result) {
     }
 }
 
+/**
+ * @dev result = a**b
+ */
 function pow(uint256 a, uint256 b) pure returns (uint256 result) {
     /// @solidity memory-safe-assembly
     assembly {
@@ -1812,6 +2327,9 @@ function pow(uint256 a, uint256 b) pure returns (uint256 result) {
     }
 }
 
+/**
+ * @dev result = a ^ b
+ */
 function xor(uint256 a, uint256 b) pure returns (uint256 result) {
     /// @solidity memory-safe-assembly
     assembly {
